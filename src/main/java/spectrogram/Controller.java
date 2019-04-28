@@ -10,9 +10,7 @@
     import org.datavec.audio.Wave;
     import org.datavec.audio.extension.*;
 
-    import javax.sound.sampled.UnsupportedAudioFileException;
     import java.io.*;
-    import java.net.URISyntaxException;
 
     public class Controller {
         public ImageView imgDisplay;
