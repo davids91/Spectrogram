@@ -1,6 +1,9 @@
     package spectrogram;
 
     import javafx.event.ActionEvent;
+    import javafx.scene.control.Alert;
+    import javafx.scene.control.Button;
+    import javafx.scene.control.ButtonType;
     import javafx.scene.image.ImageView;
     import javafx.scene.image.PixelWriter;
     import javafx.scene.image.WritableImage;
@@ -11,10 +14,97 @@
     import org.datavec.audio.extension.*;
 
     import java.io.*;
+    import java.util.prefs.Preferences;
 
     public class Controller {
         public ImageView imgDisplay;
+        public Button openDefaultBtn;
         private Stage primaryStage;
+        private final Preferences userPref = Preferences.userNodeForPackage(Controller.class);
+
+        PlaylistHandler plHandler;
+
+        /* Try to load in default playlist */
+        String playlistPath = userPref.get("defaultPlayList", "");
+
+        public void initialize()
+        {
+            /* Initialize objects */
+            plHandler = new PlaylistHandler();
+
+            File defPlayList = new File(playlistPath);
+            if(
+                (!playlistPath.isEmpty())
+                    &&(defPlayList.exists())
+            )
+            {
+                openDefaultBtn.setDisable(false);
+            }
+            else
+            {
+                openDefaultBtn.setDisable(true);
+            }
+        }
+
+        public void openExistingPlayList() throws IOException
+        {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Playlist");
+            File resultFile = fileChooser.showOpenDialog(primaryStage);
+            
+            if(null != resultFile)
+            {
+                openPlayList(resultFile);
+            }
+        }
+
+        public void createNewPlayList() throws IOException
+        {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Create Playlist File");
+            File resultFile = fileChooser.showSaveDialog(primaryStage);
+
+            if(null == resultFile)
+            {
+                if(!resultFile.exists())
+                {
+                    resultFile.createNewFile();
+                }
+                openPlayList(resultFile);
+            }
+        }
+
+        public void openPlayList(File playlist)
+        {
+            if(plHandler.openPlayList(playlist))
+            System.out.println("Playlist opened!");
+            else
+            System.out.println("Unable to open playlist!");
+        }
+
+        public void setDefaultPlaylist()
+        {
+            if(plHandler.isPlaylistValid())
+            {
+                String path = "";
+                try {
+                    path = plHandler.getPlayListPath();
+                } catch (InvalidPlaylistException e) {
+                    e.printStackTrace();
+                }
+                finally
+                {
+                    userPref.put("defaultPlayList", path);
+                    System.out.println("Playlist " + path + "Set as default!");
+                }
+            }
+            else
+            {
+                Alert alert = new Alert( Alert.AlertType.ERROR);
+                alert.setContentText("Invalid playlist!");
+                alert.showAndWait();//.filter((response) -> response == ButtonType.OK);
+            }
+        }
 
         public void setStage(Stage stg)
         {

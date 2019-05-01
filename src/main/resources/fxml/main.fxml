@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="506.0" prefWidth="831.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="spectrogram.Controller">
+<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="spectrogram.Controller">
    <children>
       <HBox prefHeight="100.0" prefWidth="200.0">
          <children>
             <VBox prefHeight="100.0" prefWidth="164.0">
                <children>
-                  <Button mnemonicParsing="false" text="Set Playlist" />
-                  <Button mnemonicParsing="false" text="Make Default" />
-                  <Button mnemonicParsing="false" text="Create New Playlist" />
+                  <Button fx:id="setPlayListBtn" mnemonicParsing="false" onAction="#openExistingPlayList" text="Open Playlist" />
+                  <Button fx:id="openDefaultBtn" mnemonicParsing="false" text="Open Default" />
+                  <Button fx:id="makeDefBtn" disable="true" mnemonicParsing="false" onAction="#setDefaultPlaylist" text="Make Playlist Default" />
+                  <Button fx:id="newPlayListBtn" mnemonicParsing="false" onAction="#createNewPlayList" text="Create New Playlist" />
                </children>
             </VBox>
-            <Label maxWidth="1.7976931348623157E308" text="&lt;&lt;PlayList name &gt;&gt;" />
+            <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="&lt;&lt;PlayList name &gt;&gt;">
+               <font>
+                  <Font name="Bauhaus 93" size="50.0" />
+               </font></Label>
          </children>
       </HBox>
       <VBox prefHeight="200.0" prefWidth="100.0">
