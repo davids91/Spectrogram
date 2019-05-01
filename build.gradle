@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.7'
+}
+
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile "org.deeplearning4j:deeplearning4j-core:1.0.0-beta3"
+    compile "org.nd4j:nd4j-native-platform:1.0.0-beta3"
+    compile group: 'org.datavec', name: 'datavec-data-audio', version: '1.0.0-beta3'
+    compile group: 'com.googlecode.soundlibs', name: 'mp3spi', version: '1.9.5.4' /* MP3 read */
+}
+
+javafx {
+    modules = [ 'javafx.controls' , 'javafx.fxml' ]
+}
+
+application {
+    mainClassName = 'spectrogram.Main'
+}
