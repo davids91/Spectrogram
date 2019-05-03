@@ -42,9 +42,6 @@
             ) {
                 openPlayList(defPlayList);
             }else{ /* default playlist doesn't exist */ }
-
-
-
         }
 
         public void openExistingPlayList() throws IOException
@@ -73,6 +70,9 @@
                 {
                     resultFile.createNewFile();
                 }
+
+                /* Add Playlist file to ... well */
+
                 openPlayList(resultFile);
             }
         }
@@ -98,7 +98,7 @@
 
         public void setDefaultPlaylist()
         {
-            if(plHandler.isPlaylistValid())
+            if(PlaylistHandler.Validity.notAFile.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 String path = "";
                 try {

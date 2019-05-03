@@ -18,6 +18,7 @@ dependencies {
     compile "org.nd4j:nd4j-native-platform:1.0.0-beta3"
     compile group: 'org.datavec', name: 'datavec-data-audio', version: '1.0.0-beta3'
     compile group: 'com.googlecode.soundlibs', name: 'mp3spi', version: '1.9.5.4' /* MP3 read */
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 }
 
 javafx {

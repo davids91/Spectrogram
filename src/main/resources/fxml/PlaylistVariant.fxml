@@ -7,10 +7,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.PlaylistVariant">
    <children>
-      <HBox layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308">
+      <HBox maxWidth="1.7976931348623157E308" prefHeight="410.0" prefWidth="686.0">
          <children>
             <VBox>
                <children>
@@ -23,6 +22,9 @@
                         <Button mnemonicParsing="false" text="&gt;&gt;" />
                      </children>
                   </HBox>
+                  <Separator prefWidth="200.0" />
+                  <Label text="&lt;&lt; Neural Net Name &gt;&gt;" />
+                  <Button mnemonicParsing="false" text="Load Neural Net" />
                </children>
             </VBox>
             <VBox maxWidth="1.7976931348623157E308">
