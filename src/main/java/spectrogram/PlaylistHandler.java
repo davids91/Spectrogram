@@ -28,5 +28,14 @@ public class PlaylistHandler {
             throw new InvalidPlaylistException();
         }
     }
-
+    public String getPlayListName() throws InvalidPlaylistException {
+        if(isPlaylistValid())
+        {
+            return playlist.getName();
+        }
+        else
+        {
+            throw new InvalidPlaylistException();
+        }
+    }
 }

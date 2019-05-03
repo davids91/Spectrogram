@@ -4,6 +4,7 @@
     import javafx.scene.control.Alert;
     import javafx.scene.control.Button;
     import javafx.scene.control.ButtonType;
+    import javafx.scene.control.Label;
     import javafx.scene.image.ImageView;
     import javafx.scene.image.PixelWriter;
     import javafx.scene.image.WritableImage;
@@ -19,37 +20,38 @@
     public class Controller {
         public ImageView imgDisplay;
         public Button openDefaultBtn;
+        public Label playlistNameLabel;
         private Stage primaryStage;
         private final Preferences userPref = Preferences.userNodeForPackage(Controller.class);
 
         PlaylistHandler plHandler;
-
-        /* Try to load in default playlist */
         String playlistPath = userPref.get("defaultPlayList", "");
+        private final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Salsa Assistant Playlist(*.sap)", "*.sap");
+
 
         public void initialize()
         {
             /* Initialize objects */
             plHandler = new PlaylistHandler();
 
+            /* Try to load in default playlist */
             File defPlayList = new File(playlistPath);
             if(
                 (!playlistPath.isEmpty())
                     &&(defPlayList.exists())
-            )
-            {
-                openDefaultBtn.setDisable(false);
-            }
-            else
-            {
-                openDefaultBtn.setDisable(true);
-            }
+            ) {
+                openPlayList(defPlayList);
+            }else{ /* default playlist doesn't exist */ }
+
+
+
         }
 
         public void openExistingPlayList() throws IOException
         {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Playlist");
+            fileChooser.getExtensionFilters().add(extFilter);
             File resultFile = fileChooser.showOpenDialog(primaryStage);
             
             if(null != resultFile)
@@ -62,6 +64,7 @@
         {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Create Playlist File");
+            fileChooser.getExtensionFilters().add(extFilter);
             File resultFile = fileChooser.showSaveDialog(primaryStage);
 
             if(null == resultFile)
@@ -77,9 +80,20 @@
         public void openPlayList(File playlist)
         {
             if(plHandler.openPlayList(playlist))
-            System.out.println("Playlist opened!");
+            {
+                try {
+                    playlistNameLabel.setText(plHandler.getPlayListName());
+                    openDefaultBtn.setDisable(false);
+                } catch (InvalidPlaylistException e) {
+                    e.printStackTrace();
+                    openDefaultBtn.setDisable(true);
+                }
+            }
             else
-            System.out.println("Unable to open playlist!");
+            {
+                playlistNameLabel.setText("<< Playlist name >>");
+                openDefaultBtn.setDisable(true);
+            }
         }
 
         public void setDefaultPlaylist()

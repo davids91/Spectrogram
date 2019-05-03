@@ -1,0 +1,29 @@
+{
+  "name": "<<name>>",
+  "netLocation": "<<netLocation>>",
+  "variant1Name": {
+    "netLocation": "<<netLocation>>",
+    "0": "<<songLocation>>",
+    "1": "<<songLocation>>",
+    "2": "<<songLocation>>",
+    "3": "<<songLocation>>",
+    "4": "<<songLocation>>"
+  },
+  "variant2Name": {
+    "netLocation": "<<netLocation>>",
+    "0": "<<songLocation>>",
+    "1": "<<songLocation>>",
+    "2": "<<songLocation>>",
+    "3": "<<songLocation>>",
+    "4": "<<songLocation>>"
+  },
+  "variant3Name": {
+    "netLocation": "<<netLocation>>",
+    "0": "<<songLocation>>",
+    "1": "<<songLocation>>",
+    "2": "<<songLocation>>",
+    "3": "<<songLocation>>",
+    "4": "<<songLocation>>"
+  }
+
+}
