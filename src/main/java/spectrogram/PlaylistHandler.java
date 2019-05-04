@@ -24,6 +24,13 @@ public class PlaylistHandler {
             /* Initialize and set up JSON object */
             playlistObj = new JsonObject();
             playlistObj.addProperty("name", playlistFile.getName());
+
+            /* Write JSON object out to the file */
+            try (FileWriter file = new FileWriter(playlistFile)) {
+                file.write(playlistObj.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         else
         { /* Should not override a valid playlist */
@@ -31,11 +38,36 @@ public class PlaylistHandler {
         }
     }
 
-    public boolean openPlayList(File playlist)
+    private void parsePlaylist() throws InvalidPlaylistException, JsonSyntaxException {
+        if(Validity.emptyFile.ordinal() < isPlaylistValid().ordinal())
+        {
+            InputStream is = null;
+            String fileText = "";
+            try {
+                is = new FileInputStream(playlistFile);
+                BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+                String line = buf.readLine();
+                StringBuilder sb = new StringBuilder();
+                while(line != null) { sb.append(line).append("\n"); line = buf.readLine(); }
+                fileText = sb.toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            JsonParser parser = new JsonParser();
+            playlistObj = (JsonObject)parser.parse(fileText);
+        }
+        else
+        {
+            throw new InvalidPlaylistException();
+        }
+    }
+
+    public boolean openPlayList(File playlist) throws InvalidPlaylistException , JsonSyntaxException
     {
         if(Validity.emptyFile.ordinal() >= isPlaylistValid().ordinal())
-        {
+        { /* No playlist is open */
             this.playlistFile = playlist;
+            parsePlaylist();
             return (Validity.valid == isPlaylistValid());
         }
         else
@@ -56,33 +88,17 @@ public class PlaylistHandler {
             return Validity.notAFile;
         }
 
-        String fileText = "";
-        if(0 < playlistFile.length())
-        { /* The file has a length! let's read it in! */
-            InputStream is = null;
-            try {
-                is = new FileInputStream(playlistFile);
-                BufferedReader buf = new BufferedReader(new InputStreamReader(is));
-                String line = buf.readLine();
-                StringBuilder sb = new StringBuilder();
-                while(line != null) { sb.append(line).append("\n"); line = buf.readLine(); }
-                fileText = sb.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else
-        {
+        if(0 == playlistFile.length())
+        { /* The file doesn't have any content in it */
             return Validity.emptyFile;
         }
 
-        JsonParser parser = new JsonParser();
-        try {
-            playlistObj = (JsonObject)parser.parse(fileText);
-        } catch (JsonSyntaxException e) {
+        if(true != playlistObj.isJsonObject())
+        {
             return  Validity.invalidJSON;
         }
-        /* TODO: Tell when it's valid!  */
+
+        /* TODO: Tell when the Playlist is empty!  */
 
         return Validity.noexist;
     }

@@ -40,7 +40,11 @@
                 (!playlistPath.isEmpty())
                     &&(defPlayList.exists())
             ) {
-                openPlayList(defPlayList);
+                try {
+                    openPlayList(defPlayList);
+                } catch (InvalidPlaylistException e) {
+                    e.printStackTrace();
+                }
             }else{ /* default playlist doesn't exist */ }
         }
 
@@ -53,7 +57,11 @@
             
             if(null != resultFile)
             {
-                openPlayList(resultFile);
+                try {
+                    openPlayList(resultFile);
+                } catch (InvalidPlaylistException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -73,12 +81,15 @@
 
                 /* Add Playlist file to ... well */
 
-                openPlayList(resultFile);
+                try {
+                    openPlayList(resultFile);
+                } catch (InvalidPlaylistException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
-        public void openPlayList(File playlist)
-        {
+        public void openPlayList(File playlist) throws InvalidPlaylistException {
             if(plHandler.openPlayList(playlist))
             {
                 try {
