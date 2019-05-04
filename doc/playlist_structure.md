@@ -10,6 +10,9 @@ The Extension of the playlist shall be *.sap(Salsa Assistant Playlist).
 The Playlist file shall contain the following labels: 
  - the name of the playlist is decided based on the filename without the extension
  - `netLocation`: The location of a preferred Neural Net, optional
+ - `lastSVar`: Last Selected Variant
  
 Any other label shall represent a variant, which shall be a JSON object.
-The Variant JSON object shall contain the songs locations under a priority index
+The Variant JSON object shall contain 
+ - `0`..`1`..`2`..: the songs locations under a priority index.
+ - `lastSInd`: Last selected song index inside the variant

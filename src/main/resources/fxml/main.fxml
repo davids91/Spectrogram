@@ -35,8 +35,8 @@
             <Separator prefWidth="200.0" />
             <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <TabPane prefHeight="467.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" />
-                  <Button fx:id="addVarianBtn" layoutX="663.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="137.0" text="Add Variant" visible="false" />
+                  <TabPane fx:id="variantTabPane" prefHeight="467.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" />
+                  <Button fx:id="addVariantBtn" layoutX="663.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="137.0" text="Add Variant" visible="false" />
                </children>
             </AnchorPane>
          </children>

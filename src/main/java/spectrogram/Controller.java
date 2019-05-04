@@ -1,9 +1,7 @@
     package spectrogram;
 
     import javafx.event.ActionEvent;
-    import javafx.scene.control.Alert;
-    import javafx.scene.control.Button;
-    import javafx.scene.control.Label;
+    import javafx.scene.control.*;
     import javafx.scene.image.ImageView;
     import javafx.scene.image.PixelWriter;
     import javafx.scene.image.WritableImage;
@@ -17,6 +15,7 @@
     import org.datavec.audio.extension.*;
 
     import java.io.*;
+    import java.util.Random;
     import java.util.prefs.Preferences;
 
     public class Controller {
@@ -25,7 +24,8 @@
         public Label playlistNameLabel;
         public Button setPlayListBtn;
         public Button makeDefBtn;
-        public Button addVarianBtn;
+        public Button addVariantBtn;
+        public TabPane variantTabPane;
         private Stage primaryStage;
         private final Preferences userPref = Preferences.userNodeForPackage(Controller.class);
 
@@ -117,13 +117,6 @@
             }else throw new IOException("Unable to create new playlist file!");
         }
 
-        private void playlistInvalidUpdateUI()
-        {
-            playlistNameLabel.setText("<< Playlist name >>");
-            openDefaultBtn.setDisable(true);
-            makeDefBtn.setDisable(true);
-        }
-
         private void playlistValidUpdateUI()
         {
             if(PlaylistHandler.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
@@ -142,6 +135,15 @@
                         makeDefBtn.setDisable(false);
                         openDefaultBtn.setDisable(false);
                     }
+
+                    /* Fill up the tabPane with the variants from the playlist */
+                    addVariantBtn.setVisible(true);
+                    Tab tab = new Tab();
+                    tab.setText("New Tab");
+                    tab.setId("newTab" + new Random().nextInt());
+                    tab.setClosable(true);
+                    variantTabPane.getTabs().add(tab);
+                    variantTabPane.getSelectionModel().selectLast();
                 } catch (InvalidPlaylistException e) {
                     e.printStackTrace();
                     openDefaultBtn.setDisable(true);
@@ -152,6 +154,15 @@
             {
                 playlistInvalidUpdateUI();
             }
+        }
+
+        private void playlistInvalidUpdateUI()
+        {
+            playlistNameLabel.setText("<< Playlist name >>");
+            openDefaultBtn.setDisable(true);
+            makeDefBtn.setDisable(true);
+            addVariantBtn.setVisible(false);
+            variantTabPane.getTabs().removeAll();
         }
 
         public void setDefaultPlaylist()

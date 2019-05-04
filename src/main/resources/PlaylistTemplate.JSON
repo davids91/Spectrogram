@@ -1,8 +1,10 @@
 {
   "name": "<<name>>",
   "netLocation": "<<netLocation>>",
+  "lastSVar": "variant1Name",
   "variant1Name": {
     "netLocation": "<<netLocation>>",
+    "lastSInd": "3",
     "0": "<<songLocation>>",
     "1": "<<songLocation>>",
     "2": "<<songLocation>>",
@@ -11,6 +13,7 @@
   },
   "variant2Name": {
     "netLocation": "<<netLocation>>",
+    "lastSInd": "3",
     "0": "<<songLocation>>",
     "1": "<<songLocation>>",
     "2": "<<songLocation>>",
@@ -19,6 +22,7 @@
   },
   "variant3Name": {
     "netLocation": "<<netLocation>>",
+    "lastSInd": "3",
     "0": "<<songLocation>>",
     "1": "<<songLocation>>",
     "2": "<<songLocation>>",
