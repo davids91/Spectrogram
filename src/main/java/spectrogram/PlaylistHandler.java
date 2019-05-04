@@ -12,25 +12,26 @@ public class PlaylistHandler {
     private JsonObject playlistObj = null;
 
     public enum Validity {
-        noexist, notAFile, emptyFile, invalidJSON, emptyList, valid, encoded
+        noexist, notAFile, invalidFormat, unknownFormat, emptyFile, emptyList, valid, encoded
     }
 
     public void initializePlaylist() throws PlaylistOverrideException {
         if(
-            (Validity.emptyFile.ordinal() <= isPlaylistValid().ordinal())
+            (Validity.unknownFormat.ordinal() <= isPlaylistValid().ordinal())
             &&(Validity.valid.ordinal() >= isPlaylistValid().ordinal())
         )
         { /* playlist exists, but isn't valid */
             /* Initialize and set up JSON object */
             playlistObj = new JsonObject();
-            playlistObj.addProperty("name", playlistFile.getName());
-
-            /* Write JSON object out to the file */
+            
+            /* Write JSON object out to the file * There is nothing to write yet.
+            System.out.println("Writing out: " + playlistObj.toString());
             try (FileWriter file = new FileWriter(playlistFile)) {
                 file.write(playlistObj.toString());
+                file.flush();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            } /**/
         }
         else
         { /* Should not override a valid playlist */
@@ -38,23 +39,22 @@ public class PlaylistHandler {
         }
     }
 
-    private void parsePlaylist() throws InvalidPlaylistException, JsonSyntaxException {
-        if(Validity.emptyFile.ordinal() < isPlaylistValid().ordinal())
+    private void parsePlaylist() throws InvalidPlaylistException {
+        if(Validity.unknownFormat.ordinal() <= isPlaylistValid().ordinal())
         {
-            InputStream is = null;
-            String fileText = "";
             try {
-                is = new FileInputStream(playlistFile);
+                InputStream is = new FileInputStream(playlistFile);
                 BufferedReader buf = new BufferedReader(new InputStreamReader(is));
                 String line = buf.readLine();
                 StringBuilder sb = new StringBuilder();
                 while(line != null) { sb.append(line).append("\n"); line = buf.readLine(); }
-                fileText = sb.toString();
+                JsonParser parser = new JsonParser();
+                playlistObj = (JsonObject)(parser.parse(sb.toString()));
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (JsonSyntaxException | ClassCastException e) {
+                playlistObj = null; /* JSON interpretation error, or classCast from JSONNull to Json object */
             }
-            JsonParser parser = new JsonParser();
-            playlistObj = (JsonObject)parser.parse(fileText);
         }
         else
         {
@@ -62,12 +62,27 @@ public class PlaylistHandler {
         }
     }
 
-    public boolean openPlayList(File playlist) throws InvalidPlaylistException , JsonSyntaxException
+    public boolean openPlayList(File playlist)throws InvalidPlaylistException, JsonSyntaxException
     {
         if(Validity.emptyFile.ordinal() >= isPlaylistValid().ordinal())
-        { /* No playlist is open */
-            this.playlistFile = playlist;
-            parsePlaylist();
+        { /* No valid playlist is actually open */
+            this.playlistFile = playlist; /* Update the Playlist */
+            if(Validity.unknownFormat == isPlaylistValid())
+            { /* If the playlist is an existing, not empty file at least */
+                parsePlaylist();
+            }
+            if(Validity.unknownFormat.ordinal() <= isPlaylistValid().ordinal())
+            { /* Still invalid Format --> Playlist is empty / new */
+                try {
+                    initializePlaylist();
+                } catch (PlaylistOverrideException e) {
+                    e.printStackTrace();
+                }
+            }
+            else
+            { /* The playlist doesn't exist or it's not a file */
+                throw new InvalidPlaylistException("Playlist to be opened doesn't exist or is not a file.");
+            }
             return (Validity.valid == isPlaylistValid());
         }
         else
@@ -78,33 +93,33 @@ public class PlaylistHandler {
 
     public Validity isPlaylistValid()
     {
+        /* if the playlist file is non-existent */
         if((null == playlistFile)||(!playlistFile.exists()))
-        { /* if the playlist file is non-existent */
             return Validity.noexist;
-        }
 
-        if(playlistFile.isFile())
-        {
+        if(!playlistFile.isFile())
             return Validity.notAFile;
-        }
 
+        if((null == playlistObj)||(!playlistObj.isJsonObject()))
+            return Validity.unknownFormat;
+
+        /* The file doesn't have any content in it */
         if(0 == playlistFile.length())
-        { /* The file doesn't have any content in it */
             return Validity.emptyFile;
-        }
-
-        if(true != playlistObj.isJsonObject())
-        {
-            return  Validity.invalidJSON;
-        }
 
         /* TODO: Tell when the Playlist is empty!  */
 
         return Validity.noexist;
     }
 
+    public void closePlaylist()
+    {
+        playlistObj = null;
+        playlistFile = null;
+    }
+
     public String getPlayListPath() throws InvalidPlaylistException {
-        if(Validity.valid == isPlaylistValid())
+        if(Validity.emptyFile.ordinal() <= isPlaylistValid().ordinal())
         {
             return playlistFile.getPath();
         }
@@ -114,7 +129,7 @@ public class PlaylistHandler {
         }
     }
     public String getPlayListName() throws InvalidPlaylistException {
-        if(Validity.valid == isPlaylistValid())
+        if(Validity.emptyFile.ordinal() <= isPlaylistValid().ordinal())
         {
             return playlistFile.getName();
         }

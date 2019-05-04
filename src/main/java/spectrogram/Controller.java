@@ -3,11 +3,13 @@
     import javafx.event.ActionEvent;
     import javafx.scene.control.Alert;
     import javafx.scene.control.Button;
-    import javafx.scene.control.ButtonType;
     import javafx.scene.control.Label;
     import javafx.scene.image.ImageView;
     import javafx.scene.image.PixelWriter;
     import javafx.scene.image.WritableImage;
+    import javafx.scene.input.KeyCode;
+    import javafx.scene.input.KeyCodeCombination;
+    import javafx.scene.input.KeyCombination;
     import javafx.scene.paint.Color;
     import javafx.stage.FileChooser;
     import javafx.stage.Stage;
@@ -21,13 +23,14 @@
         public ImageView imgDisplay;
         public Button openDefaultBtn;
         public Label playlistNameLabel;
+        public Button setPlayListBtn;
+        public Button makeDefBtn;
         private Stage primaryStage;
         private final Preferences userPref = Preferences.userNodeForPackage(Controller.class);
 
         PlaylistHandler plHandler;
         String playlistPath = userPref.get("defaultPlayList", "");
         private final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Salsa Assistant Playlist(*.sap)", "*.sap");
-
 
         public void initialize()
         {
@@ -41,26 +44,35 @@
                     &&(defPlayList.exists())
             ) {
                 try {
-                    openPlayList(defPlayList);
+                    plHandler.openPlayList(defPlayList);
+                    playlistOpenedUpdateUI();
                 } catch (InvalidPlaylistException e) {
+                   userPref.put("defaultPlayList","");/* Playlist is invalid! Let's delete it */
                     e.printStackTrace();
                 }
             }else{ /* default playlist doesn't exist */ }
         }
 
-        public void openExistingPlayList() throws IOException
+        public void openExistingPlayList()
         {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Playlist");
             fileChooser.getExtensionFilters().add(extFilter);
             File resultFile = fileChooser.showOpenDialog(primaryStage);
-            
+
             if(null != resultFile)
             {
                 try {
-                    openPlayList(resultFile);
+                    plHandler.openPlayList(resultFile);
+                    if(PlaylistHandler.Validity.emptyFile == plHandler.isPlaylistValid())
+                    {
+                        plHandler.initializePlaylist();
+                    }
+                    playlistOpenedUpdateUI();
                 } catch (InvalidPlaylistException e) {
-                    e.printStackTrace();
+                    e.printStackTrace(); /* The File given as a playlist is not in acceptable format */
+                } catch (PlaylistOverrideException e) {
+                    e.printStackTrace(); /* The existing playlist was empty, but also valid..? */
                 }
             }
         }
@@ -72,38 +84,49 @@
             fileChooser.getExtensionFilters().add(extFilter);
             File resultFile = fileChooser.showSaveDialog(primaryStage);
 
+            System.out.println("Playlist file is: " + resultFile.getPath());
+
             if(null == resultFile)
             {
-                if(!resultFile.exists())
-                {
-                    resultFile.createNewFile();
-                }
+                if(
+                    (resultFile.exists()) /* File exists */
+                    ||((!resultFile.exists()) /* Or can be created */
+                    &&(resultFile.createNewFile()))
+                ){
+                    try {
+                        plHandler.openPlayList(resultFile);
+                        plHandler.initializePlaylist();
+                        playlistOpenedUpdateUI();
+                    } catch (InvalidPlaylistException | PlaylistOverrideException e) {
+                        e.printStackTrace();
+                    }
+                }else throw new IOException("Unable to create new playlist file!");
+            }else{ /* Invalid file was given, maybe Cancelled */ }
 
-                /* Add Playlist file to ... well */
-
-                try {
-                    openPlayList(resultFile);
-                } catch (InvalidPlaylistException e) {
-                    e.printStackTrace();
-                }
-            }
         }
 
-        public void openPlayList(File playlist) throws InvalidPlaylistException {
-            if(plHandler.openPlayList(playlist))
+        public void playlistInvalidUpdateUI()
+        {
+            playlistNameLabel.setText("<< Playlist name >>");
+            openDefaultBtn.setDisable(true); /* TODO: Make a distinction for loaded playlist and valid default playlist */
+            makeDefBtn.setDisable(true);
+        }
+
+        public void playlistOpenedUpdateUI()
+        {
+            if(PlaylistHandler.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 try {
                     playlistNameLabel.setText(plHandler.getPlayListName());
-                    openDefaultBtn.setDisable(false);
+                    makeDefBtn.setDisable(false);
                 } catch (InvalidPlaylistException e) {
                     e.printStackTrace();
-                    openDefaultBtn.setDisable(true);
+                    playlistInvalidUpdateUI();
                 }
             }
             else
             {
-                playlistNameLabel.setText("<< Playlist name >>");
-                openDefaultBtn.setDisable(true);
+                playlistInvalidUpdateUI();
             }
         }
 
@@ -133,7 +156,10 @@
 
         public void setStage(Stage stg)
         {
-            primaryStage = stg;
+            primaryStage = stg; /* Set the stage */
+            primaryStage.getScene().getAccelerators().put( /* Register Ctrl + O keystroke reaction */
+                    new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
+                    () -> openExistingPlayList());
         }
 
         public void loadMusic(ActionEvent actionEvent) {

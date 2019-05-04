@@ -8,7 +8,7 @@ The Extension of the playlist shall be *.sap(Salsa Assistant Playlist).
 
 ## Structure
 The Playlist file shall contain the following labels: 
- - `name`: the name of the playlist
+ - the name of the playlist is decided based on the filename without the extension
  - `netLocation`: The location of a preferred Neural Net, optional
  
 Any other label shall represent a variant, which shall be a JSON object.
