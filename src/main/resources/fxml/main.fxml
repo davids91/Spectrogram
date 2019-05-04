@@ -13,7 +13,7 @@
             <VBox prefHeight="100.0" prefWidth="164.0">
                <children>
                   <Button fx:id="setPlayListBtn" mnemonicParsing="false" onAction="#openExistingPlayList" text="Open Playlist" />
-                  <Button fx:id="openDefaultBtn" disable="true" mnemonicParsing="false" text="Open Default" />
+                  <Button fx:id="openDefaultBtn" disable="true" mnemonicParsing="false" onAction="#openDefaultPlaylist" text="Open Default" />
                   <Button fx:id="makeDefBtn" disable="true" mnemonicParsing="false" onAction="#setDefaultPlaylist" text="Make Playlist Default" />
                   <Button fx:id="newPlayListBtn" mnemonicParsing="false" onAction="#createNewPlayList" text="Create New Playlist" />
                </children>
@@ -35,21 +35,8 @@
             <Separator prefWidth="200.0" />
             <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <TabPane prefHeight="467.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
-                    <tabs>
-                      <Tab text="Variant1">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </Tab>
-                      <Tab text="Variant2">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                      </Tab>
-                    </tabs>
-                  </TabPane>
-                  <Button layoutX="663.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="137.0" text="Add Variant" />
+                  <TabPane prefHeight="467.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" />
+                  <Button fx:id="addVarianBtn" layoutX="663.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="137.0" text="Add Variant" visible="false" />
                </children>
             </AnchorPane>
          </children>

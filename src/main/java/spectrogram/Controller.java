@@ -25,11 +25,13 @@
         public Label playlistNameLabel;
         public Button setPlayListBtn;
         public Button makeDefBtn;
+        public Button addVarianBtn;
         private Stage primaryStage;
         private final Preferences userPref = Preferences.userNodeForPackage(Controller.class);
 
-        PlaylistHandler plHandler;
-        String playlistPath = userPref.get("defaultPlayList", "");
+        private PlaylistHandler plHandler;
+        private String playlistPath = userPref.get("defaultPlayList", "");
+        private String defaultPlaylistPath = userPref.get("defaultPlayList", "");
         private final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Salsa Assistant Playlist(*.sap)", "*.sap");
 
         public void initialize()
@@ -42,15 +44,27 @@
             if(
                 (!playlistPath.isEmpty())
                     &&(defPlayList.exists())
-            ) {
+            ) { /* Default playlist exists */
                 try {
-                    plHandler.openPlayList(defPlayList);
-                    playlistOpenedUpdateUI();
+                    plHandler.openPlaylist(defPlayList);
+                    playlistValidUpdateUI();
                 } catch (InvalidPlaylistException e) {
-                   userPref.put("defaultPlayList","");/* Playlist is invalid! Let's delete it */
+                   userPref.put("defaultPlayList","");/* Default Playlist is invalid! Let's delete it */
                     e.printStackTrace();
                 }
-            }else{ /* default playlist doesn't exist */ }
+            } else playlistInvalidUpdateUI();
+        }
+
+        private void openPlaylist(File playlist) throws InvalidPlaylistException, PlaylistOverrideException {
+            if(null != playlist)
+            {
+                if(plHandler.openPlaylist(playlist))
+                {
+                    if(PlaylistHandler.Validity.emptyFile == plHandler.isPlaylistValid())
+                        plHandler.initializePlaylist();
+                    playlistValidUpdateUI();
+                } else playlistValidUpdateUI();
+            }
         }
 
         public void openExistingPlayList()
@@ -59,24 +73,27 @@
             fileChooser.setTitle("Open Playlist");
             fileChooser.getExtensionFilters().add(extFilter);
             File resultFile = fileChooser.showOpenDialog(primaryStage);
-
-            if(null != resultFile)
-            {
-                try {
-                    plHandler.openPlayList(resultFile);
-                    if(PlaylistHandler.Validity.emptyFile == plHandler.isPlaylistValid())
-                    {
-                        plHandler.initializePlaylist();
-                    }
-                    playlistOpenedUpdateUI();
-                } catch (InvalidPlaylistException e) {
-                    e.printStackTrace(); /* The File given as a playlist is not in acceptable format */
-                } catch (PlaylistOverrideException e) {
-                    e.printStackTrace(); /* The existing playlist was empty, but also valid..? */
-                }
+            if(resultFile.exists())
+                plHandler.closePlaylist();
+            try {
+                openPlaylist(resultFile);
+            } catch (InvalidPlaylistException | PlaylistOverrideException e) {
+                playlistInvalidUpdateUI();
+                e.printStackTrace();
             }
         }
 
+        public void openDefaultPlaylist()
+        {
+            File resultFile = new File(defaultPlaylistPath);
+            try {
+                openPlaylist(resultFile);
+            } catch (InvalidPlaylistException | PlaylistOverrideException e) {
+                playlistInvalidUpdateUI();
+                e.printStackTrace();
+            }
+
+        }
         public void createNewPlayList() throws IOException
         {
             FileChooser fileChooser = new FileChooser();
@@ -85,42 +102,49 @@
             File resultFile = fileChooser.showSaveDialog(primaryStage);
 
             System.out.println("Playlist file is: " + resultFile.getPath());
-
-            if(null == resultFile)
-            {
-                if(
-                    (resultFile.exists()) /* File exists */
-                    ||((!resultFile.exists()) /* Or can be created */
-                    &&(resultFile.createNewFile()))
-                ){
-                    try {
-                        plHandler.openPlayList(resultFile);
-                        plHandler.initializePlaylist();
-                        playlistOpenedUpdateUI();
-                    } catch (InvalidPlaylistException | PlaylistOverrideException e) {
-                        e.printStackTrace();
-                    }
-                }else throw new IOException("Unable to create new playlist file!");
-            }else{ /* Invalid file was given, maybe Cancelled */ }
-
+            if(
+                (resultFile.exists()) /* File exists */
+                ||((!resultFile.exists()) /* Or can be created */
+                &&(resultFile.createNewFile()))
+            ){
+                try {
+                    plHandler.openPlaylist(resultFile);
+                    plHandler.initializePlaylist();
+                    playlistValidUpdateUI();
+                } catch (InvalidPlaylistException | PlaylistOverrideException e) {
+                    e.printStackTrace();
+                }
+            }else throw new IOException("Unable to create new playlist file!");
         }
 
-        public void playlistInvalidUpdateUI()
+        private void playlistInvalidUpdateUI()
         {
             playlistNameLabel.setText("<< Playlist name >>");
-            openDefaultBtn.setDisable(true); /* TODO: Make a distinction for loaded playlist and valid default playlist */
+            openDefaultBtn.setDisable(true);
             makeDefBtn.setDisable(true);
         }
 
-        public void playlistOpenedUpdateUI()
+        private void playlistValidUpdateUI()
         {
             if(PlaylistHandler.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 try {
                     playlistNameLabel.setText(plHandler.getPlayListName());
-                    makeDefBtn.setDisable(false);
+                    if(
+                        (PlaylistHandler.Validity.emptyFile.ordinal() <= plHandler.isPlaylistValid().ordinal())
+                            &&(plHandler.getPlayListPath().equalsIgnoreCase(defaultPlaylistPath))
+                    ) { /* Default Playlist equals with the opened one */
+                        makeDefBtn.setDisable(true);
+                        openDefaultBtn.setDisable(true);
+                    }
+                    else
+                    {
+                        makeDefBtn.setDisable(false);
+                        openDefaultBtn.setDisable(false);
+                    }
                 } catch (InvalidPlaylistException e) {
                     e.printStackTrace();
+                    openDefaultBtn.setDisable(true);
                     playlistInvalidUpdateUI();
                 }
             }
@@ -134,16 +158,14 @@
         {
             if(PlaylistHandler.Validity.notAFile.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
-                String path = "";
                 try {
-                    path = plHandler.getPlayListPath();
-                } catch (InvalidPlaylistException e) {
-                    e.printStackTrace();
-                }
-                finally
-                {
+                    String path = plHandler.getPlayListPath();
                     userPref.put("defaultPlayList", path);
-                    System.out.println("Playlist " + path + "Set as default!");
+                    defaultPlaylistPath = path;
+                    playlistValidUpdateUI();
+                } catch (InvalidPlaylistException e) {
+                    playlistInvalidUpdateUI();
+                    e.printStackTrace();
                 }
             }
             else
@@ -154,7 +176,7 @@
             }
         }
 
-        public void setStage(Stage stg)
+        void setStage(Stage stg)
         {
             primaryStage = stg; /* Set the stage */
             primaryStage.getScene().getAccelerators().put( /* Register Ctrl + O keystroke reaction */

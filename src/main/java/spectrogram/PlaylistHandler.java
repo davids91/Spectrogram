@@ -62,7 +62,7 @@ public class PlaylistHandler {
         }
     }
 
-    public boolean openPlayList(File playlist)throws InvalidPlaylistException, JsonSyntaxException
+    public boolean openPlaylist(File playlist) throws InvalidPlaylistException, JsonSyntaxException
     {
         if(Validity.emptyFile.ordinal() >= isPlaylistValid().ordinal())
         { /* No valid playlist is actually open */
@@ -125,7 +125,7 @@ public class PlaylistHandler {
         }
         else
         {
-            throw new InvalidPlaylistException();
+            throw new InvalidPlaylistException("Unable to determine playlist path");
         }
     }
     public String getPlayListName() throws InvalidPlaylistException {
