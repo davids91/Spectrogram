@@ -59,11 +59,8 @@
             if(null != playlist)
             {
                 if(plHandler.openPlaylist(playlist))
-                {
-                    if(PlaylistHandler.Validity.emptyFile == plHandler.isPlaylistValid())
-                        plHandler.initializePlaylist();
                     playlistValidUpdateUI();
-                } else playlistValidUpdateUI();
+                else playlistInvalidUpdateUI();
             }
         }
 
@@ -109,9 +106,8 @@
             ){
                 try {
                     plHandler.openPlaylist(resultFile);
-                    plHandler.initializePlaylist();
                     playlistValidUpdateUI();
-                } catch (InvalidPlaylistException | PlaylistOverrideException e) {
+                } catch (InvalidPlaylistException e) {
                     e.printStackTrace();
                 }
             }else throw new IOException("Unable to create new playlist file!");
