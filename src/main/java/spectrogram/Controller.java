@@ -1,6 +1,7 @@
     package spectrogram;
 
     import javafx.event.ActionEvent;
+    import javafx.fxml.FXML;
     import javafx.scene.control.*;
     import javafx.scene.image.ImageView;
     import javafx.scene.image.PixelWriter;
@@ -28,6 +29,7 @@
         public Button makeDefBtn;
         public Button addVariantBtn;
         public TabPane variantTabPane;
+        public TextField newVariantText;
         private Stage primaryStage;
         private final Preferences userPref = Preferences.userNodeForPackage(Controller.class);
 
@@ -57,6 +59,19 @@
             } else playlistInvalidUpdateUI();
         }
 
+        @FXML
+        private void addNewVariant()
+        {
+            System.out.println("Adding new Variant.." + plHandler.isPlaylistValid());
+            if(
+                (null != plHandler)
+                &&(PlaylistHandler.Validity.emptyList.ordinal() <= plHandler.isPlaylistValid().ordinal())
+            ){
+                if(plHandler.addVariant(newVariantText.getText()))playlistValidUpdateUI();
+                else playlistInvalidUpdateUI();
+            } /* else playlistHandler is in an invalid state */
+        }
+
         private void openPlaylist(File playlist) throws InvalidPlaylistException, PlaylistOverrideException {
             if(null != playlist)
             {
@@ -66,7 +81,8 @@
             }
         }
 
-        public void openExistingPlayList()
+        @FXML
+        void openExistingPlayList()
         {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Playlist");
@@ -82,7 +98,8 @@
             }
         }
 
-        public void openDefaultPlaylist()
+        @FXML
+        void openDefaultPlaylist()
         {
             File resultFile = new File(defaultPlaylistPath);
             try {
@@ -93,7 +110,9 @@
             }
 
         }
-        public void createNewPlayList() throws IOException
+
+        @FXML
+        void createNewPlayList() throws IOException
         {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Create Playlist File");
@@ -135,11 +154,13 @@
                     }
 
                     /* Fill up the tabPane with the variants from the playlist */
-                    variantTabPane.getTabs().removeAll();
                     addVariantBtn.setVisible(true);
+                    newVariantText.setVisible(true);
+                    variantTabPane.getTabs().clear();
                     ArrayList<String> variants = plHandler.getPlaylistVariants();
                     for(String variant : variants)
                     {
+                        System.out.println("Adding Variant: " + variant);
                         Tab tab = new Tab();
                         tab.setText(variant);
                         tab.setId("variant" + new Random().nextInt());
@@ -166,10 +187,12 @@
             openDefaultBtn.setDisable(true);
             makeDefBtn.setDisable(true);
             addVariantBtn.setVisible(false);
+            newVariantText.setVisible(false);
             variantTabPane.getTabs().removeAll();
         }
 
-        public void setDefaultPlaylist()
+        @FXML
+        void setDefaultPlaylist()
         {
             if(PlaylistHandler.Validity.notAFile.ordinal() < plHandler.isPlaylistValid().ordinal())
             {

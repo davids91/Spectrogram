@@ -7,10 +7,9 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-public class PlaylistHandler {
+class PlaylistHandler {
 
     private File playlistFile = null;
     private JsonObject playlistObj = null;
@@ -19,7 +18,27 @@ public class PlaylistHandler {
         undefined, noexist, notAFile, invalidFormat, unknownFormat, emptyFile, emptyList, valid, encoded
     }
 
-    public ArrayList<String> getPlaylistVariants() throws InvalidPlaylistException {
+    boolean addVariant(String variant){
+        if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()){
+            playlistObj.add(variant, new JsonObject());
+            System.out.println(playlistObj.toString());
+            return selectVariant(variant); /* includes a `flush()` */
+        }else return false;
+    }
+
+    boolean selectVariant(String variant)
+    {
+        if(
+        (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
+        &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
+        ){
+            playlistObj.addProperty(PlaylistStructure.LASTSELECTEDVARIANT.key(), variant);
+            flush();
+            return true;
+        }else return false;
+    }
+
+    ArrayList<String> getPlaylistVariants() throws InvalidPlaylistException {
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) {
             ArrayList<String> variants = new ArrayList();
 
@@ -35,6 +54,19 @@ public class PlaylistHandler {
         }else throw new InvalidPlaylistException("Unable to read back playlist variants");
     }
 
+    private void flush()
+    {
+        if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) {
+            System.out.println("Writing out: " + playlistObj.toString());
+            try (FileWriter file = new FileWriter(playlistFile)) {
+                file.write(playlistObj.toString());
+                file.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } /* else Object state is not valid */
+    }
+
     private void initializePlaylist() throws PlaylistOverrideException {
         if(
             (Validity.unknownFormat.ordinal() <= isPlaylistValid().ordinal())
@@ -43,21 +75,9 @@ public class PlaylistHandler {
         { /* playlist exists, but isn't valid */
             /* Initialize and set up JSON object */
             playlistObj = new JsonObject();
-            playlistObj.addProperty(PlaylistStructure.LASTSELECTEDVARIANT.key(),"default");
 
-            /* Add a default Variant */
-            JsonObject newVariant = new JsonObject();
-
-            playlistObj.add("default", newVariant);
-
-            /* Write JSON object out to the file */
-            System.out.println("Writing out: " + playlistObj.toString());
-            try (FileWriter file = new FileWriter(playlistFile)) {
-                file.write(playlistObj.toString());
-                file.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            addVariant("default"); /* Add a default Variant */
+            flush(); /* Write JSON object out to the file */
         }
         else
         { /* Should not override a valid playlist */
@@ -131,19 +151,20 @@ public class PlaylistHandler {
         if(0 == playlistFile.length())
             return Validity.emptyFile; /* The file doesn't have any content in it */
 
-        /*if((null == playlistObj)||(!playlistObj.isJsonObject()))
-            return Validity.invalidFormat; /* Not sure how to set this one..  */
+        if((null != playlistObj)&&(playlistObj.isJsonObject()))
+        {
+            if(2 < playlistObj.size()) return Validity.valid;
+            else if((playlistObj.size() == 2) /* Only 2 objects are present inside the JSON */
+                &&(playlistObj.getAsJsonObject( /* inside the playList */
+                    /* The last used Variant */
+                    playlistObj.getAsJsonPrimitive(PlaylistStructure.LASTSELECTEDVARIANT.key()).getAsString()
+                ).size() == 0) /* Has a size of 0 */
+            )return Validity.emptyList;
+        }else return Validity.invalidFormat;
 
-        if((null != playlistObj)&&(playlistObj.size() == 2) /* Only 2 objects are present inside the JSON */
-            &&(playlistObj.getAsJsonObject( /* inside the playList */
-                playlistObj.getAsJsonPrimitive(PlaylistStructure.LASTSELECTEDVARIANT.key()).getAsString() /* The last used Variant */
-            ).size() == 0) /* Has a size of 0 */
-        )
-            return Validity.emptyList;
+        /* TODO: Encryption */
 
-
-        /* TODO: Tell when the Playlist is valid!  */
-
+        System.out.println("Something is undefined boss!");
         return Validity.undefined;
     }
 
