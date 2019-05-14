@@ -15,6 +15,8 @@
     import org.datavec.audio.extension.*;
 
     import java.io.*;
+    import java.util.ArrayList;
+    import java.util.List;
     import java.util.Random;
     import java.util.prefs.Preferences;
 
@@ -133,13 +135,19 @@
                     }
 
                     /* Fill up the tabPane with the variants from the playlist */
+                    variantTabPane.getTabs().removeAll();
                     addVariantBtn.setVisible(true);
-                    Tab tab = new Tab();
-                    tab.setText("New Tab");
-                    tab.setId("newTab" + new Random().nextInt());
-                    tab.setClosable(true);
-                    variantTabPane.getTabs().add(tab);
-                    variantTabPane.getSelectionModel().selectLast();
+                    ArrayList<String> variants = plHandler.getPlaylistVariants();
+                    for(String variant : variants)
+                    {
+                        Tab tab = new Tab();
+                        tab.setText(variant);
+                        tab.setId("variant" + new Random().nextInt());
+                        tab.setClosable(true);
+                        variantTabPane.getTabs().add(tab);
+                        variantTabPane.getSelectionModel().selectLast();
+                    }
+
                 } catch (InvalidPlaylistException e) {
                     e.printStackTrace();
                     openDefaultBtn.setDisable(true);

@@ -1,10 +1,14 @@
 package spectrogram;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class PlaylistHandler {
 
@@ -15,6 +19,22 @@ public class PlaylistHandler {
         undefined, noexist, notAFile, invalidFormat, unknownFormat, emptyFile, emptyList, valid, encoded
     }
 
+    public ArrayList<String> getPlaylistVariants() throws InvalidPlaylistException {
+        if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) {
+            ArrayList<String> variants = new ArrayList();
+
+            for(Map.Entry<String, JsonElement> item : playlistObj.entrySet()){
+                if(
+                    (!PlaylistStructure.isControlKey(item.getKey()))
+                    &&(item.getValue().isJsonObject())
+                ){ /* Not a control key And it's a JSON Object*/
+                    variants.add(item.getKey()); /* All JSONObjects except the Control values count as Variants */
+                }/* else might be a Control key, might be a simple property */
+            }
+            return variants;
+        }else throw new InvalidPlaylistException("Unable to read back playlist variants");
+    }
+
     private void initializePlaylist() throws PlaylistOverrideException {
         if(
             (Validity.unknownFormat.ordinal() <= isPlaylistValid().ordinal())
@@ -23,7 +43,7 @@ public class PlaylistHandler {
         { /* playlist exists, but isn't valid */
             /* Initialize and set up JSON object */
             playlistObj = new JsonObject();
-            playlistObj.addProperty("lastSVar","default");
+            playlistObj.addProperty(PlaylistStructure.LASTSELECTEDVARIANT.key(),"default");
 
             /* Add a default Variant */
             JsonObject newVariant = new JsonObject();
@@ -116,7 +136,7 @@ public class PlaylistHandler {
 
         if((null != playlistObj)&&(playlistObj.size() == 2) /* Only 2 objects are present inside the JSON */
             &&(playlistObj.getAsJsonObject( /* inside the playList */
-                playlistObj.getAsJsonPrimitive("lastSVar").getAsString() /* The last used Variant */
+                playlistObj.getAsJsonPrimitive(PlaylistStructure.LASTSELECTEDVARIANT.key()).getAsString() /* The last used Variant */
             ).size() == 0) /* Has a size of 0 */
         )
             return Validity.emptyList;
