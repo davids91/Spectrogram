@@ -1,4 +1,4 @@
-package spectrogram;
+package spectrogram_services;
 
 public class TrainerController {
 }

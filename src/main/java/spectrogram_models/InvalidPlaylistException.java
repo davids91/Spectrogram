@@ -1,4 +1,4 @@
-package spectrogram;
+package spectrogram_models;
 
 public class InvalidPlaylistException extends Exception {
     public InvalidPlaylistException() {

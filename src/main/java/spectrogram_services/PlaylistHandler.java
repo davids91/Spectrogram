@@ -1,15 +1,18 @@
-package spectrogram;
+package spectrogram_services;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import spectrogram_models.InvalidPlaylistException;
+import spectrogram_models.PlaylistOverrideException;
+import spectrogram_models.PlaylistStructure;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
 
-class PlaylistHandler {
+public class PlaylistHandler {
 
     private File playlistFile = null;
     private JsonObject playlistObj = null;
@@ -18,7 +21,7 @@ class PlaylistHandler {
         undefined, noexist, notAFile, invalidFormat, unknownFormat, emptyFile, emptyList, valid, encoded
     }
 
-    boolean addVariant(String variant){
+    public boolean addVariant(String variant){
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()){
             playlistObj.add(variant, new JsonObject());
             System.out.println(playlistObj.toString());
@@ -26,19 +29,19 @@ class PlaylistHandler {
         }else return false;
     }
 
-    boolean selectVariant(String variant)
+    public boolean selectVariant(String variant)
     {
         if(
         (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
         &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
         ){
-            playlistObj.addProperty(PlaylistStructure.LASTSELECTEDVARIANT.key(), variant);
+            playlistObj.addProperty(PlaylistStructure.lastSelectedVariant.key(), variant);
             flush();
             return true;
         }else return false;
     }
 
-    ArrayList<String> getPlaylistVariants() throws InvalidPlaylistException {
+    public ArrayList<String> getPlaylistVariants() throws InvalidPlaylistException {
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) {
             ArrayList<String> variants = new ArrayList();
 
@@ -118,7 +121,7 @@ class PlaylistHandler {
         }
     }
 
-    boolean openPlaylist(File playlist) throws InvalidPlaylistException, JsonSyntaxException
+    public boolean openPlaylist(File playlist) throws InvalidPlaylistException, JsonSyntaxException
     {
 
         this.playlistFile = playlist; /* Update the Playlist */
@@ -136,7 +139,7 @@ class PlaylistHandler {
         return (Validity.invalidFormat.ordinal() < isPlaylistValid().ordinal());
     }
 
-    Validity isPlaylistValid()
+    public Validity isPlaylistValid()
     {
         /* if the playlist file is non-existent */
         if((null == playlistFile)||(!playlistFile.exists()))
@@ -157,7 +160,7 @@ class PlaylistHandler {
             else if((playlistObj.size() == 2) /* Only 2 objects are present inside the JSON */
                 &&(playlistObj.getAsJsonObject( /* inside the playList */
                     /* The last used Variant */
-                    playlistObj.getAsJsonPrimitive(PlaylistStructure.LASTSELECTEDVARIANT.key()).getAsString()
+                    playlistObj.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).getAsString()
                 ).size() == 0) /* Has a size of 0 */
             )return Validity.emptyList;
         }else return Validity.invalidFormat;
@@ -168,13 +171,13 @@ class PlaylistHandler {
         return Validity.undefined;
     }
 
-    void closePlaylist()
+    public void closePlaylist()
     {
         playlistObj = null;
         playlistFile = null;
     }
 
-    String getPlayListPath() throws InvalidPlaylistException {
+    public String getPlayListPath() throws InvalidPlaylistException {
         if(Validity.emptyFile.ordinal() <= isPlaylistValid().ordinal())
         {
             return playlistFile.getPath();
@@ -185,7 +188,7 @@ class PlaylistHandler {
         }
     }
 
-    String getPlayListName() throws InvalidPlaylistException {
+    public String getPlayListName() throws InvalidPlaylistException {
         if(Validity.emptyFile.ordinal() <= isPlaylistValid().ordinal())
         {
             return playlistFile.getName();

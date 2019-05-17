@@ -1,23 +1,15 @@
     package spectrogram;
 
-    import javafx.event.ActionEvent;
     import javafx.fxml.FXML;
     import javafx.scene.control.*;
     import javafx.scene.image.ImageView;
-    import javafx.scene.image.PixelWriter;
-    import javafx.scene.image.WritableImage;
-    import javafx.scene.input.KeyCode;
-    import javafx.scene.input.KeyCodeCombination;
-    import javafx.scene.input.KeyCombination;
-    import javafx.scene.paint.Color;
     import javafx.stage.FileChooser;
-    import javafx.stage.Stage;
-    import org.datavec.audio.Wave;
-    import org.datavec.audio.extension.*;
+    import spectrogram_models.InvalidPlaylistException;
+    import spectrogram_models.PlaylistOverrideException;
+    import spectrogram_services.PlaylistHandler;
 
     import java.io.*;
     import java.util.ArrayList;
-    import java.util.List;
     import java.util.Random;
     import java.util.prefs.Preferences;
 
@@ -30,19 +22,15 @@
         public Button addVariantBtn;
         public TabPane variantTabPane;
         public TextField newVariantText;
-        private Stage primaryStage;
+
         private final Preferences userPref = Preferences.userNodeForPackage(Controller.class);
 
-        private PlaylistHandler plHandler;
         private String playlistPath = userPref.get("defaultPlayList", "");
         private String defaultPlaylistPath = userPref.get("defaultPlayList", "");
         private final FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Salsa Assistant Playlist(*.sap)", "*.sap");
 
         public void initialize()
         {
-            /* Initialize objects */
-            plHandler = new PlaylistHandler();
-
             /* Try to load in default playlist */
             File defPlayList = new File(playlistPath);
             if(
@@ -50,7 +38,7 @@
                     &&(defPlayList.exists())
             ) { /* Default playlist exists */
                 try {
-                    plHandler.openPlaylist(defPlayList);
+                    Global.plHandler.openPlaylist(defPlayList);
                     playlistValidUpdateUI();
                 } catch (InvalidPlaylistException e) {
                    userPref.put("defaultPlayList","");/* Default Playlist is invalid! Let's delete it */
@@ -62,12 +50,12 @@
         @FXML
         private void addNewVariant()
         {
-            System.out.println("Adding new Variant.." + plHandler.isPlaylistValid());
+            System.out.println("Adding new Variant.." + Global.plHandler.isPlaylistValid());
             if(
-                (null != plHandler)
-                &&(PlaylistHandler.Validity.emptyList.ordinal() <= plHandler.isPlaylistValid().ordinal())
+                (null != Global.plHandler)
+                &&(PlaylistHandler.Validity.emptyList.ordinal() <= Global.plHandler.isPlaylistValid().ordinal())
             ){
-                if(plHandler.addVariant(newVariantText.getText()))playlistValidUpdateUI();
+                if(Global.plHandler.addVariant(newVariantText.getText()))playlistValidUpdateUI();
                 else playlistInvalidUpdateUI();
             } /* else playlistHandler is in an invalid state */
         }
@@ -75,7 +63,7 @@
         private void openPlaylist(File playlist) throws InvalidPlaylistException, PlaylistOverrideException {
             if(null != playlist)
             {
-                if(plHandler.openPlaylist(playlist))
+                if(Global.plHandler.openPlaylist(playlist))
                     playlistValidUpdateUI();
                 else playlistInvalidUpdateUI();
             }
@@ -87,9 +75,9 @@
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Playlist");
             fileChooser.getExtensionFilters().add(extFilter);
-            File resultFile = fileChooser.showOpenDialog(primaryStage);
+            File resultFile = fileChooser.showOpenDialog(Global.primaryStage);
             if(resultFile.exists())
-                plHandler.closePlaylist();
+                Global.plHandler.closePlaylist();
             try {
                 openPlaylist(resultFile);
             } catch (InvalidPlaylistException | PlaylistOverrideException e) {
@@ -117,7 +105,7 @@
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Create Playlist File");
             fileChooser.getExtensionFilters().add(extFilter);
-            File resultFile = fileChooser.showSaveDialog(primaryStage);
+            File resultFile = fileChooser.showSaveDialog(Global.primaryStage);
 
             System.out.println("Playlist file is: " + resultFile.getPath());
             if(
@@ -126,7 +114,7 @@
                 &&(resultFile.createNewFile()))
             ){
                 try {
-                    plHandler.openPlaylist(resultFile);
+                    Global.plHandler.openPlaylist(resultFile);
                     playlistValidUpdateUI();
                 } catch (InvalidPlaylistException e) {
                     e.printStackTrace();
@@ -136,13 +124,13 @@
 
         private void playlistValidUpdateUI()
         {
-            if(PlaylistHandler.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
+            if(PlaylistHandler.Validity.unknownFormat.ordinal() < Global.plHandler.isPlaylistValid().ordinal())
             {
                 try {
-                    playlistNameLabel.setText(plHandler.getPlayListName());
+                    playlistNameLabel.setText(Global.plHandler.getPlayListName());
                     if(
-                        (PlaylistHandler.Validity.emptyFile.ordinal() <= plHandler.isPlaylistValid().ordinal())
-                            &&(plHandler.getPlayListPath().equalsIgnoreCase(defaultPlaylistPath))
+                        (PlaylistHandler.Validity.emptyFile.ordinal() <= Global.plHandler.isPlaylistValid().ordinal())
+                            &&(Global.plHandler.getPlayListPath().equalsIgnoreCase(defaultPlaylistPath))
                     ) { /* Default Playlist equals with the opened one */
                         makeDefBtn.setDisable(true);
                         openDefaultBtn.setDisable(true);
@@ -157,7 +145,7 @@
                     addVariantBtn.setVisible(true);
                     newVariantText.setVisible(true);
                     variantTabPane.getTabs().clear();
-                    ArrayList<String> variants = plHandler.getPlaylistVariants();
+                    ArrayList<String> variants = Global.plHandler.getPlaylistVariants();
                     for(String variant : variants)
                     {
                         System.out.println("Adding Variant: " + variant);
@@ -194,10 +182,10 @@
         @FXML
         void setDefaultPlaylist()
         {
-            if(PlaylistHandler.Validity.notAFile.ordinal() < plHandler.isPlaylistValid().ordinal())
+            if(PlaylistHandler.Validity.notAFile.ordinal() < Global.plHandler.isPlaylistValid().ordinal())
             {
                 try {
-                    String path = plHandler.getPlayListPath();
+                    String path = Global.plHandler.getPlayListPath();
                     userPref.put("defaultPlayList", path);
                     defaultPlaylistPath = path;
                     playlistValidUpdateUI();
@@ -212,79 +200,5 @@
                 alert.setContentText("Invalid playlist!");
                 alert.showAndWait();//.filter((response) -> response == ButtonType.OK);
             }
-        }
-
-        void setStage(Stage stg)
-        {
-            primaryStage = stg; /* Set the stage */
-            primaryStage.getScene().getAccelerators().put( /* Register Ctrl + O keystroke reaction */
-                    new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
-                    () -> openExistingPlayList());
-        }
-
-        public void loadMusic(ActionEvent actionEvent) {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Open Resource File");
-            //File inputFile = fileChooser.showOpenDialog(primaryStage);
-            //File resultFile = fileChooser.showSaveDialog(primaryStage);
-            /*try {
-                //WavConverter.createWavFromMp3(getClass().getResource("/sounds/winxp.mp3"), getClass().getResource("/sounds/winxp.wav"));
-                WavConverter.createWavFromMp3(inputFile, resultFile);
-            } catch (UnsupportedAudioFileException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            } */
-
-            File toAnalyze = fileChooser.showOpenDialog(primaryStage);
-
-            //InputStream is = getClass().getResourceAsStream("/sounds/CambioDolor.wav");
-            InputStream is;
-            try {
-                if(toAnalyze.exists())
-                {
-                    is = new FileInputStream(toAnalyze);
-                    Wave wave = new Wave(is);
-                    Spectrogram sptr = new Spectrogram(wave);
-
-                    double[][] spData = sptr.getNormalizedSpectrogramData();
-                    WritableImage resImg = new WritableImage(spData.length,spData[0].length);
-                    PixelWriter pxWr = resImg.getPixelWriter();
-
-                    int x = 0, y = 0;
-                    boolean redRow = false;
-                    double fillage = 0;
-                    for(double[] col : spData) /* one sample time */
-                    {
-                        fillage = 0;
-                        y = 0;
-                        for(double item : col)
-                        {
-                            if(fillage <= (spData[0].length) * 0.2)
-                            { /* quite filled time */
-                                resImg.getPixelWriter().setColor(x,y, Color.rgb((int)(item * 255),0,0));
-                            }
-                            else
-                            { /* not quite filled time */
-                                resImg.getPixelWriter().setColor(x,y, Color.rgb((int)(item * 255),(int)(item * 255),(int)(item * 255)));
-                            }
-                            fillage += item;
-                            //System.out.println("data: " + item + "\n");
-                            y++;
-                        }
-                        x++;
-                    }
-
-                    System.out.println("Done! Image size is: " + x + "," + y);
-                    imgDisplay.setFitWidth(x);
-                    imgDisplay.setFitHeight(y);
-                    imgDisplay.setImage(resImg);
-                }else{ /* File doesn't exist */ }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-
         }
     }
