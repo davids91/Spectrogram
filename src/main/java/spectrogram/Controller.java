@@ -76,13 +76,14 @@
             fileChooser.setTitle("Open Playlist");
             fileChooser.getExtensionFilters().add(extFilter);
             File resultFile = fileChooser.showOpenDialog(Global.primaryStage);
-            if(resultFile.exists())
+            if(resultFile.exists()){
                 Global.plHandler.closePlaylist();
-            try {
-                openPlaylist(resultFile);
-            } catch (InvalidPlaylistException | PlaylistOverrideException e) {
-                playlistInvalidUpdateUI();
-                e.printStackTrace();
+                try {
+                    openPlaylist(resultFile);
+                } catch (InvalidPlaylistException | PlaylistOverrideException e) {
+                    playlistInvalidUpdateUI();
+                    e.printStackTrace();
+                }
             }
         }
 

@@ -156,13 +156,17 @@ public class PlaylistHandler {
 
         if((null != playlistObj)&&(playlistObj.isJsonObject()))
         {
-            if(2 < playlistObj.size()) return Validity.valid;
-            else if((playlistObj.size() == 2) /* Only 2 objects are present inside the JSON */
-                &&(playlistObj.getAsJsonObject( /* inside the playList */
-                    /* The last used Variant */
-                    playlistObj.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).getAsString()
-                ).size() == 0) /* Has a size of 0 */
-            )return Validity.emptyList;
+            try {
+                if (2 < playlistObj.size()) return Validity.valid;
+                else if ((playlistObj.size() == 2) /* Only 2 objects are present inside the JSON */
+                        && (playlistObj.getAsJsonObject( /* inside the playList */
+                        /* The last used Variant */
+                        playlistObj.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).getAsString()
+                    ).size() == 0) /* Has a size of 0 */
+                ) return Validity.emptyList;
+            }catch (NullPointerException e){ /* JSON Control Sting ot found in playlist File */
+                return Validity.invalidFormat;
+            }
         }else return Validity.invalidFormat;
 
         /* TODO: Encryption */
