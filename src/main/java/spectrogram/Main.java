@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     Stage stage;
+    Parent variantRoot;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -21,14 +22,19 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 800, 600));
 
         FXMLLoader songsLoader = new FXMLLoader(getClass().getResource("/fxml/PlaylistVariant.fxml"));
-        Global.variantRoot = songsLoader.load();
+        variantRoot = songsLoader.load();
 
         /* Global Keystrokes */
         primaryStage.getScene().getAccelerators().put( /* Register Ctrl + O keystroke reaction */
         new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
         () -> ((Controller)mainLoader.getController()).openExistingPlayList());
         stage = primaryStage;
+
+        /* Set up Global */
+        Global.setVariantRoot(this);
         Global.setStage(this);
+
+
         primaryStage.show();
 
     }
