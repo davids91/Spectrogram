@@ -175,6 +175,18 @@ public class PlaylistHandler {
         return Validity.undefined;
     }
 
+    public boolean removeVariant(String variant){
+        if(Validity.emptyList.ordinal() < isPlaylistValid().ordinal()){
+            if(
+                (!PlaylistStructure.isControlKey(variant))/* The item is not a Control key */
+                &&(playlistObj.getAsJsonPrimitive(variant).isJsonObject())/* The item exists in the playlist as a Variant */
+            ){
+                playlistObj.remove(variant);
+                return true;
+            } else /* The variant doesn't exist or a control key is being removed */ return false;
+        } /* else the playlist doesn't have any variants to remove */ return false;
+    }
+
     public void closePlaylist()
     {
         playlistObj = null;

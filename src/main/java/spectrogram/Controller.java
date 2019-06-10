@@ -7,6 +7,7 @@
     import spectrogram_models.InvalidPlaylistException;
     import spectrogram_models.PlaylistOverrideException;
     import spectrogram_services.PlaylistHandler;
+    import spectrogram_services.VariantTabHandler;
 
     import java.io.*;
     import java.util.ArrayList;
@@ -146,14 +147,13 @@
                     addVariantBtn.setVisible(true);
                     newVariantText.setVisible(true);
                     variantTabPane.getTabs().clear();
+                    variantTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.SELECTED_TAB);
                     ArrayList<String> variants = Global.plHandler.getPlaylistVariants();
                     for(String variant : variants)
                     {
                         System.out.println("Adding Variant: " + variant);
-                        Tab tab = new Tab();
-                        tab.setText(variant);
+                        VariantTabHandler tab = new VariantTabHandler(Global.plHandler,variant);
                         tab.setId("variant" + new Random().nextInt());
-                        tab.setClosable(true);
                         variantTabPane.getTabs().add(tab);
                         variantTabPane.getSelectionModel().selectLast();
                     }
@@ -172,7 +172,7 @@
 
         private void playlistInvalidUpdateUI()
         {
-            playlistNameLabel.setText("<< Playlist name >>");
+            playlistNameLabel.setText("<< Invalid Playlist >>");
             openDefaultBtn.setDisable(true);
             makeDefBtn.setDisable(true);
             addVariantBtn.setVisible(false);
