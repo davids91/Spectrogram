@@ -15,6 +15,9 @@
     import java.util.prefs.Preferences;
 
     public class Controller {
+
+        PlaylistHandler plHandler = new PlaylistHandler();
+
         public ImageView imgDisplay;
         public Button openDefaultBtn;
         public Label playlistNameLabel;
@@ -39,7 +42,7 @@
                     &&(defPlayList.exists())
             ) { /* Default playlist exists */
                 try {
-                    Global.plHandler.openPlaylist(defPlayList);
+                    plHandler.openPlaylist(defPlayList);
                     playlistValidUpdateUI();
                 } catch (InvalidPlaylistException e) {
                    userPref.put("defaultPlayList","");/* Default Playlist is invalid! Let's delete it */
@@ -52,10 +55,10 @@
         private void addNewVariant()
         {
             if(
-                (null != Global.plHandler)
-                &&(PlaylistHandler.Validity.emptyList.ordinal() <= Global.plHandler.isPlaylistValid().ordinal())
+                (null != plHandler)
+                &&(PlaylistHandler.Validity.emptyList.ordinal() <= plHandler.isPlaylistValid().ordinal())
             ){
-                if(Global.plHandler.addVariant(newVariantText.getText()))reloadVariants();
+                if(plHandler.addVariant(newVariantText.getText()))reloadVariants();
                 else playlistInvalidUpdateUI();
             } /* else playlistHandler is in an invalid state */
         }
@@ -63,7 +66,7 @@
         private void openPlaylist(File playlist) throws InvalidPlaylistException, PlaylistOverrideException {
             if(null != playlist)
             {
-                if(Global.plHandler.openPlaylist(playlist))
+                if(plHandler.openPlaylist(playlist))
                     playlistValidUpdateUI();
                 else playlistInvalidUpdateUI();
             }
@@ -75,9 +78,9 @@
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Playlist");
             fileChooser.getExtensionFilters().add(extFilter);
-            File resultFile = fileChooser.showOpenDialog(Global.primaryStage);
+            File resultFile = fileChooser.showOpenDialog(Global.getStage());
             if((null != resultFile)&&(resultFile.exists())){
-                Global.plHandler.closePlaylist();
+                plHandler.closePlaylist();
                 try {
                     openPlaylist(resultFile);
                 } catch (InvalidPlaylistException | PlaylistOverrideException e) {
@@ -106,7 +109,7 @@
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Create Playlist File");
             fileChooser.getExtensionFilters().add(extFilter);
-            File resultFile = fileChooser.showSaveDialog(Global.primaryStage);
+            File resultFile = fileChooser.showSaveDialog(Global.getStage());
 
             System.out.println("Playlist file is: " + resultFile.getPath());
             if( (null != resultFile) /* Cancel is pressed */
@@ -119,7 +122,7 @@
                 )
             ){
                 try {
-                    Global.plHandler.openPlaylist(resultFile);
+                    plHandler.openPlaylist(resultFile);
                     playlistValidUpdateUI();
                 } catch (InvalidPlaylistException e) {
                     e.printStackTrace();
@@ -128,7 +131,7 @@
         }
 
         private void reloadVariants(){
-            if(PlaylistHandler.Validity.unknownFormat.ordinal() < Global.plHandler.isPlaylistValid().ordinal())
+            if(PlaylistHandler.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 /* Fill up the tabPane with the variants from the playlist */
                 addVariantBtn.setVisible(true);
@@ -137,7 +140,7 @@
                 variantTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.SELECTED_TAB);
                 ArrayList<String> variants = null;
                 try {
-                    variants = Global.plHandler.getPlaylistVariants();
+                    variants = plHandler.getPlaylistVariants();
                 } catch (InvalidPlaylistException e) {
                     e.printStackTrace();
                 }
@@ -151,7 +154,7 @@
                 for(String variant : variants)
                 {
                     System.out.println("Adding Variant: " + variant);
-                    VariantTabHandler tab = new VariantTabHandler(Global.plHandler,variant);
+                    VariantTabHandler tab = new VariantTabHandler(plHandler,variant);
                     tab.setId("variant" + new Random().nextInt());
                     variantTabPane.getTabs().add(tab);
                     variantTabPane.getSelectionModel().selectLast();
@@ -161,13 +164,13 @@
 
         private void playlistValidUpdateUI()
         {
-            if(PlaylistHandler.Validity.unknownFormat.ordinal() < Global.plHandler.isPlaylistValid().ordinal())
+            if(PlaylistHandler.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 try {
-                    playlistNameLabel.setText(Global.plHandler.getPlayListName());
+                    playlistNameLabel.setText(plHandler.getPlayListName());
                     if(
-                        (PlaylistHandler.Validity.emptyList.ordinal() <= Global.plHandler.isPlaylistValid().ordinal())
-                            &&(Global.plHandler.getPlayListPath().equalsIgnoreCase(defaultPlaylistPath))
+                        (PlaylistHandler.Validity.emptyList.ordinal() <= plHandler.isPlaylistValid().ordinal())
+                            &&(plHandler.getPlayListPath().equalsIgnoreCase(defaultPlaylistPath))
                     ) { /* Default Playlist equals with the opened one */
                         makeDefBtn.setDisable(true);
                         openDefaultBtn.setDisable(true);
@@ -205,10 +208,10 @@
         @FXML
         void setDefaultPlaylist()
         {
-            if(PlaylistHandler.Validity.notAFile.ordinal() < Global.plHandler.isPlaylistValid().ordinal())
+            if(PlaylistHandler.Validity.notAFile.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 try {
-                    String path = Global.plHandler.getPlayListPath();
+                    String path = plHandler.getPlayListPath();
                     userPref.put("defaultPlayList", path);
                     defaultPlaylistPath = path;
                     playlistValidUpdateUI();

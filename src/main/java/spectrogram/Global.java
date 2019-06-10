@@ -1,12 +1,14 @@
 package spectrogram;
 
+import javafx.application.Application;
 import javafx.stage.Stage;
-import spectrogram_services.PlaylistHandler;
-import spectrogram_services.WavConverter;
 
-/* TODO: Reform Global logic */
 public class Global {
-    public static PlaylistHandler plHandler = new PlaylistHandler();
-    public static WavConverter wConv = null;
-    public static Stage primaryStage;
+    private static Stage primaryStage = null;
+
+    public static void setStage(Main fromApp){
+        if(null != fromApp)primaryStage = fromApp.stage;
+    }
+
+    public static Stage getStage() {return primaryStage;}
 }

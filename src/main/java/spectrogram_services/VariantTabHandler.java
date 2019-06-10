@@ -13,13 +13,14 @@ import spectrogram.Global;
 public class VariantTabHandler extends Tab {
 
     private String variant = "";
+    private PlaylistHandler plHandler = null;
 
     public VariantTabHandler(PlaylistHandler plHandler, String variant){
         setText(variant);
         this.variant = variant;
         setClosable(true);
         if(null != plHandler){
-
+            this.plHandler = plHandler;
             setOnCloseRequest(removeVariantRequest);
 
         }else throw new UnsupportedOperationException("Standalone VariantHandler not supported!");
@@ -30,7 +31,7 @@ public class VariantTabHandler extends Tab {
         alert.showAndWait();
         if (alert.getResult() != ButtonType.YES) {
             event.consume();
-        }else if(!Global.plHandler.removeVariant(variant))
+        }else if(!plHandler.removeVariant(variant))
         {
             (new Alert(Alert.AlertType.ERROR, "Unable to remove Variant!")).showAndWait();
             event.consume();

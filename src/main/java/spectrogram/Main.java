@@ -11,19 +11,21 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    Stage stage;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Global.primaryStage = primaryStage; /* Set the stage */
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("The world is my instrument, this is my playlist.");
         primaryStage.setScene(new Scene(root, 800, 600));
 
-        Global.primaryStage.getScene().getAccelerators().put( /* Register Ctrl + O keystroke reaction */
+        /* Global Keystrokes */
+        primaryStage.getScene().getAccelerators().put( /* Register Ctrl + O keystroke reaction */
         new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
         () -> ((Controller)loader.getController()).openExistingPlayList());
-
+        stage = primaryStage;
+        Global.setStage(this);
         primaryStage.show();
 
     }
