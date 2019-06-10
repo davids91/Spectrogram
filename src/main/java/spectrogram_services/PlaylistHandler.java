@@ -95,7 +95,6 @@ public class PlaylistHandler {
             ||(0 < playlistFile.length()) /* There is anything to parse */
         )
         {
-            System.out.println("Parsing " + playlistFile.getPath());
             try {
                 InputStream is = new FileInputStream(playlistFile);
                 BufferedReader buf = new BufferedReader(new InputStreamReader(is));

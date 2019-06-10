@@ -111,7 +111,6 @@
             fileChooser.getExtensionFilters().add(extFilter);
             File resultFile = fileChooser.showSaveDialog(Global.getStage());
 
-            System.out.println("Playlist file is: " + resultFile.getPath());
             if( (null != resultFile) /* Cancel is pressed */
                 &&(
                     (resultFile.exists()) /* File exists */
@@ -147,8 +146,10 @@
 
                 variantTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
                     /* TODO: Load in Controller for the playlist */
-                    if(null != newTab) /* If there the new Selected tab exists */
-                        System.out.println("Selected" + newTab.getText());
+                    if(null != newTab) { /* If there the new Selected tab exists */
+                        oldTab.setContent(null);
+                        newTab.setContent(Global.variantRoot);
+                    }
                 });
 
                 for(String variant : variants)
