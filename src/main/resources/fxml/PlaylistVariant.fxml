@@ -7,13 +7,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.PlaylistVariant">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fxml.PlayVariantController">
    <children>
       <HBox maxWidth="1.7976931348623157E308" prefHeight="410.0" prefWidth="686.0">
          <children>
             <VBox>
                <children>
-                  <Button fx:id="loadBtn" mnemonicParsing="false" onAction="#loadMusic" prefHeight="25.0" prefWidth="162.0" text="Add Song" />
+                  <Button fx:id="loadBtn" mnemonicParsing="false" onAction="" prefHeight="25.0" prefWidth="162.0" text="Add Song" />
                   <Button mnemonicParsing="false" text="Train Song" />
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>

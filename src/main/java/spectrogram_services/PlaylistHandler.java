@@ -18,7 +18,7 @@ public class PlaylistHandler {
     private JsonObject playlistObj = null;
 
     public enum Validity {
-        undefined, noexist, notAFile, invalidFormat, unknownFormat, emptyFile, emptyList, valid, encoded
+        undefined, noexist, notAFile, invalidFormat, unknownFormat, emptyList, valid, encoded
     }
 
     public boolean addVariant(String variant){
@@ -152,7 +152,7 @@ public class PlaylistHandler {
             return Validity.unknownFormat; /* The playlist is an existing file, not sure about its content */
 
         if(0 == playlistFile.length())
-            return Validity.emptyFile; /* The file doesn't have any content in it */
+            return Validity.emptyList; /* The file doesn't have any content in it */
 
         if((null != playlistObj)&&(playlistObj.isJsonObject()))
         {
@@ -179,9 +179,8 @@ public class PlaylistHandler {
         if(Validity.emptyList.ordinal() < isPlaylistValid().ordinal()){
             if(
                 (!PlaylistStructure.isControlKey(variant))/* The item is not a Control key */
-                &&(playlistObj.getAsJsonPrimitive(variant).isJsonObject())/* The item exists in the playlist as a Variant */
+                &&(null != playlistObj.remove(variant))/* The item exists in the playlist as a Variant */
             ){
-                playlistObj.remove(variant);
                 return true;
             } else /* The variant doesn't exist or a control key is being removed */ return false;
         } /* else the playlist doesn't have any variants to remove */ return false;
@@ -194,7 +193,7 @@ public class PlaylistHandler {
     }
 
     public String getPlayListPath() throws InvalidPlaylistException {
-        if(Validity.emptyFile.ordinal() <= isPlaylistValid().ordinal())
+        if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal())
         {
             return playlistFile.getPath();
         }
@@ -205,7 +204,7 @@ public class PlaylistHandler {
     }
 
     public String getPlayListName() throws InvalidPlaylistException {
-        if(Validity.emptyFile.ordinal() <= isPlaylistValid().ordinal())
+        if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal())
         {
             return playlistFile.getName();
         }
