@@ -6,8 +6,9 @@
     import javafx.stage.FileChooser;
     import spectrogram_exceptions.InvalidPlaylistException;
     import spectrogram_exceptions.PlaylistOverrideException;
+    import spectrogram_models.Global;
     import spectrogram_services.PlaylistHandler;
-    import spectrogram_models.VariantTab;
+    import spectrogram_services.VariantTabHandler;
 
     import java.io.*;
     import java.util.ArrayList;
@@ -147,7 +148,7 @@
                 for(String variant : variants)
                 {
                     System.out.println("Adding Variant: " + variant);
-                    VariantTab tab = new VariantTab(plHandler,variant);
+                    VariantTabHandler tab = new VariantTabHandler(plHandler,variant);
                     tab.setId("variant" + new Random().nextInt());
                     variantTabPane.getTabs().add(tab);
                     variantTabPane.getSelectionModel().selectLast();

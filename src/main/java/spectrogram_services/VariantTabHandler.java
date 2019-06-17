@@ -1,18 +1,25 @@
-package spectrogram_models;
+package spectrogram_services;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import spectrogram_models.Global;
 import spectrogram_services.PlaylistHandler;
+import spectrogram_services.WavConverter;
 
-public class VariantTab extends Tab {
+import java.io.File;
+import java.io.FileNotFoundException;
+
+public class VariantTabHandler extends Tab {
 
     private String variant = "";
     private PlaylistHandler plHandler = null;
+    private Accordion mainAccordion = null;
 
-    public VariantTab(PlaylistHandler plHandler, String variant){
+    public VariantTabHandler(PlaylistHandler plHandler, String variant){
         setText(variant);
         this.variant = variant;
         setClosable(true);
@@ -21,7 +28,7 @@ public class VariantTab extends Tab {
             setOnCloseRequest(removeVariantRequest);
 
             /* Add an Accordion and a titledPane to add new Music */
-            Accordion mainAccordion = new Accordion();
+            mainAccordion = new Accordion();
             TitledPane addMusicTitledPane = new TitledPane();
             mainAccordion.getPanes().add(addMusicTitledPane);
 
@@ -39,7 +46,33 @@ public class VariantTab extends Tab {
     }
 
     private void addSong(){
-        System.out.println("Adding song to " + variant);
+        FileChooser flc = new FileChooser();
+        flc.setTitle("Add song to variant " + variant);
+        flc.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Musica mp3", "*.mp3"));
+        File resultFile = flc.showOpenDialog(Global.getStage());
+
+        if((null != resultFile)&&(resultFile.exists())){
+            //plHandler.addSong(variant, resultFile);
+
+            /* Add TitledPane for it */
+            TitledPane aSong = new TitledPane();
+            aSong.setText(resultFile.getName());
+
+            ImageView imgV;
+
+            /* Add Graphic for song */
+            try {
+                imgV = new ImageView(WavConverter.imageFromMp3(resultFile));
+                AnchorPane lofasz = new AnchorPane();
+                lofasz.getChildren().add(imgV);
+                aSong.setContent(lofasz);
+                mainAccordion.getPanes().add(0, aSong);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     private EventHandler<Event> removeVariantRequest = (event) -> {

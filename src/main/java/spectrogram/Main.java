@@ -8,11 +8,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
+import spectrogram_models.Global;
 
 public class Main extends Application {
 
-    Stage stage;
-    Parent variantRoot;
+    public Stage stage;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
