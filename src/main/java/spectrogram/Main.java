@@ -17,12 +17,11 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+
         Parent root = mainLoader.load();
         primaryStage.setTitle("The world is my instrument, this is my playlist.");
         primaryStage.setScene(new Scene(root, 800, 600));
 
-        FXMLLoader songsLoader = new FXMLLoader(getClass().getResource("/fxml/PlaylistVariant.fxml"));
-        variantRoot = songsLoader.load();
 
         /* Global Keystrokes */
         primaryStage.getScene().getAccelerators().put( /* Register Ctrl + O keystroke reaction */
@@ -31,7 +30,6 @@ public class Main extends Application {
         stage = primaryStage;
 
         /* Set up Global */
-        Global.setVariantRoot(this);
         Global.setStage(this);
 
 

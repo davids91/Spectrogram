@@ -4,8 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import spectrogram_models.InvalidPlaylistException;
-import spectrogram_models.PlaylistOverrideException;
+import spectrogram_exceptions.InvalidPlaylistException;
+import spectrogram_exceptions.PlaylistOverrideException;
 import spectrogram_models.PlaylistStructure;
 
 import java.io.*;

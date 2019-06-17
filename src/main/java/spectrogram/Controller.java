@@ -4,10 +4,10 @@
     import javafx.scene.control.*;
     import javafx.scene.image.ImageView;
     import javafx.stage.FileChooser;
-    import spectrogram_models.InvalidPlaylistException;
-    import spectrogram_models.PlaylistOverrideException;
+    import spectrogram_exceptions.InvalidPlaylistException;
+    import spectrogram_exceptions.PlaylistOverrideException;
     import spectrogram_services.PlaylistHandler;
-    import spectrogram_services.VariantTabHandler;
+    import spectrogram_models.VariantTab;
 
     import java.io.*;
     import java.util.ArrayList;
@@ -144,18 +144,10 @@
                     e.printStackTrace();
                 }
 
-                variantTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
-                    /* TODO: Load in Controller for the playlist */
-                    if(null != newTab) { /* If there the new Selected tab exists */
-                        oldTab.setContent(null);
-                        newTab.setContent(Global.variantRoot);
-                    }
-                });
-
                 for(String variant : variants)
                 {
                     System.out.println("Adding Variant: " + variant);
-                    VariantTabHandler tab = new VariantTabHandler(plHandler,variant);
+                    VariantTab tab = new VariantTab(plHandler,variant);
                     tab.setId("variant" + new Random().nextInt());
                     variantTabPane.getTabs().add(tab);
                     variantTabPane.getSelectionModel().selectLast();

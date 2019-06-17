@@ -6,45 +6,101 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="spectrogram.Controller">
-   <children>
+<SplitPane dividerPositions="0.2, 0.25, 0.9" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="spectrogram.Controller">
+  <items>
       <HBox prefHeight="100.0" prefWidth="200.0">
          <children>
-            <VBox prefHeight="100.0" prefWidth="164.0">
+            <VBox>
                <children>
                   <Button fx:id="setPlayListBtn" mnemonicParsing="false" onAction="#openExistingPlayList" text="Open Playlist" />
                   <Button fx:id="openDefaultBtn" disable="true" mnemonicParsing="false" onAction="#openDefaultPlaylist" text="Open Default" />
                   <Button fx:id="makeDefBtn" disable="true" mnemonicParsing="false" onAction="#setDefaultPlaylist" text="Make Playlist Default" />
                   <Button fx:id="newPlayListBtn" mnemonicParsing="false" onAction="#createNewPlayList" text="Create New Playlist" />
+                  <HBox visible="false">
+                     <children>
+                        <Button mnemonicParsing="false" text="Load Neural Net" />
+                        <Label text="&lt;&lt; Neural Net Name &gt;&gt;" />
+                     </children>
+                  </HBox>
                </children>
             </VBox>
             <Label fx:id="playlistNameLabel" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="&lt;&lt; PlayList name &gt;&gt;">
                <font>
                   <Font name="Bauhaus 93" size="50.0" />
-               </font></Label>
+               </font>
+            </Label>
          </children>
       </HBox>
-      <VBox>
+      <HBox maxWidth="1.7976931348623157E308" visible="false">
          <children>
-            <Separator prefWidth="200.0" />
-            <Label text="&lt;&lt; Neural Net Name &gt;&gt;">
-               <graphic>
-                  <Button mnemonicParsing="false" text="Load Neural Net" />
-               </graphic>
-            </Label>
-            <Separator prefWidth="200.0" />
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <TabPane fx:id="variantTabPane" prefHeight="467.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" />
-                  <HBox layoutX="569.0" layoutY="14.0" prefHeight="25.0" prefWidth="217.0">
-                     <children>
-                        <TextField fx:id="newVariantText" visible="false" />
-                        <Button fx:id="addVariantBtn" mnemonicParsing="false" onAction="#addNewVariant" prefHeight="25.0" prefWidth="137.0" text="Add Variant" visible="false" />
-                     </children>
-                  </HBox>
-               </children>
-            </AnchorPane>
+            <Button mnemonicParsing="false" text="&lt;&lt;" />
+            <Button mnemonicParsing="false" text="Play/Pause" />
+            <Button mnemonicParsing="false" text="&gt;&gt;" />
+            <Button maxHeight="1.7976931348623157E308" minWidth="-Infinity" mnemonicParsing="false" text="Repeat" />
+            <Label maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Speed" />
+            <Slider maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
          </children>
-      </VBox>
-   </children>
-</VBox>
+      </HBox>
+      <AnchorPane prefHeight="223.0" prefWidth="720.0">
+         <children>
+            <TabPane fx:id="variantTabPane" prefHeight="230.0" prefWidth="855.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <tabs>
+                  <Tab text="Untitled Tab">
+                     <content>
+                        <Accordion>
+                           <panes>
+                              <TitledPane animated="false" text="untitled 1">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" text="untitled 2">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" text="untitled 3">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                 </content>
+                              </TitledPane>
+                           </panes>
+                        </Accordion>
+                     </content>
+                  </Tab>
+                  <Tab text="Untitled Tab">
+                     <content>
+                        <Accordion>
+                           <panes>
+                              <TitledPane animated="false" text="untitled 1">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" text="untitled 2">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                 </content>
+                              </TitledPane>
+                              <TitledPane animated="false" text="untitled 3">
+                                 <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                 </content>
+                              </TitledPane>
+                           </panes>
+                        </Accordion>
+                     </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
+            <HBox layoutX="569.0" layoutY="14.0" />
+         </children>
+      </AnchorPane>
+      <HBox>
+         <children>
+            <TextField fx:id="newVariantText" visible="false" />
+            <Button fx:id="addVariantBtn" mnemonicParsing="false" onAction="#addNewVariant" prefHeight="25.0" prefWidth="137.0" text="Add Variant" visible="false" />
+         </children>
+      </HBox>
+  </items>
+</SplitPane>
