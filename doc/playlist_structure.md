@@ -1,6 +1,5 @@
 # Playlist 
 
-
 A Playlist shall contain a list of songs, and the assigned meta-data for them. 
 The playlist language shall be JSON. 
 The playlist shall be encrypted.
