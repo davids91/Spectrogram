@@ -28,6 +28,7 @@
         public TabPane variantTabPane;
         public TextField newVariantText;
 
+        /* TODO: Loading Screen */
         private final Preferences userPref = Preferences.userNodeForPackage(Controller.class);
 
         private String playlistPath = userPref.get("defaultPlayList", "");
