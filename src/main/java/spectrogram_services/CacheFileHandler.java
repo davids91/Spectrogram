@@ -7,11 +7,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class FileCacheHandler {
+public class CacheFileHandler {
     private File cacheFile = null;
     private CacheFileStructure cache = null;
 
-    public FileCacheHandler(File whereTo) throws IOException, ClassNotFoundException {
+    public CacheFileHandler(File whereTo) throws IOException, ClassNotFoundException {
         if(null != whereTo){
             cacheFile = whereTo;
             if(!cacheFile.exists()){
@@ -24,6 +24,19 @@ public class FileCacheHandler {
                 s.close();
             }
         }else throw new FileNotFoundException("Unable to create the Cache file");
+    }
+
+    /* @brief: Writes out the whole of the cache to the given File
+     * @returns: operation success */
+    public boolean writeCacheToFile(File file) throws IOException {
+        if(null != file){
+            FileOutputStream f = new FileOutputStream(file);
+            ObjectOutputStream s = new ObjectOutputStream(f);
+            s.writeObject(cache);
+            s.flush();
+            s.close();
+            return true;
+        }else return false; /* Unable to write out HashMap */
     }
 
     public boolean moveCacheTo(File destFile){
@@ -45,11 +58,10 @@ public class FileCacheHandler {
     }
 
     public Image getCachedSpectrogram(File mp3File) throws IOException {
-        Image retImg = cache.getFile(mp3File);
-        if(cache.isDirty())cache.writeCacheToFile(cacheFile);
-        return retImg;
+        return cache.getFile(mp3File);
     }
 
+    /* TODO: New Thread for saving CacheFile */
     /* TODO: New thread for maintenance */
     /* TODO: New thread for exploration */
 
