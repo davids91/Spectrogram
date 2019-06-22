@@ -1,5 +1,7 @@
 package spectrogram_services;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
@@ -12,10 +14,12 @@ import spectrogram_services.WavConverter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Map;
 
 public class VariantTabHandler extends Tab {
 
     private String variant = "";
+    private JsonObject varObj = null;
     private PlaylistHandler plHandler = null;
     private Accordion mainAccordion = null;
 
@@ -27,12 +31,28 @@ public class VariantTabHandler extends Tab {
             this.plHandler = plHandler;
             setOnCloseRequest(removeVariantRequest);
 
-            /* Add an Accordion and a titledPane to add new Music */
+            /* Add an Accordion and a titledPane for songs and to add new Music */
             mainAccordion = new Accordion();
             TitledPane addMusicTitledPane = new TitledPane();
-            mainAccordion.getPanes().add(addMusicTitledPane);
+
+            try {
+                varObj = plHandler.getVariant(variant);
+
+                /* Load in the songs from the variants */
+                TitledPane songPane = null;
+                for(Map.Entry song: varObj.entrySet()){
+                    songPane = new TitledPane();
+                    songPane.setText(song.getValue().toString());
+                    mainAccordion.getPanes().add(songPane);
+                    /* TODO: Load in song image */
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             /* Add button for adding music */
+            mainAccordion.getPanes().add(addMusicTitledPane);
             Button addMusicBtn = new Button();
             addMusicBtn.setId(variant + "addMusicBtn");
             addMusicBtn.setText("+");

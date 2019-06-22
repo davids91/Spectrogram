@@ -27,6 +27,13 @@ public class PlaylistHandler {
         }else return false;
     }
 
+
+    public boolean selectVariant(String variant, boolean writeOut){
+        boolean ret = selectVariant(variant);
+        if(writeOut)flush();
+        return ret;
+    }
+
     public boolean selectVariant(String variant)
     {
         if(
@@ -34,9 +41,18 @@ public class PlaylistHandler {
         &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
         ){
             playlistObj.addProperty(PlaylistStructure.lastSelectedVariant.key(), variant);
-            flush();
             return true;
         }else return false;
+    }
+
+    public JsonObject getVariant(String variant) throws InterruptedException {
+        if(
+                (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
+                &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
+                &&(selectVariant(variant)) /* Able to select */
+        ){
+            return playlistObj.getAsJsonObject(variant);
+        }else throw new InterruptedException("Playlist not Valid or Variant name is incorrect!");
     }
 
     public ArrayList<String> getPlaylistVariants() throws IllegalStateException {
@@ -119,12 +135,13 @@ public class PlaylistHandler {
         }
     }
 
-    public void addSongToVariant(File Song, String variant){
+    public void addSongToVariant(File song, String variant){
         if(
                 (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
                 &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
         ){
-
+            JsonObject varObj = playlistObj.getAsJsonObject(variant);
+            varObj.addProperty("" + varObj.size(), song.getPath());
             flush();
         }else throw new IllegalStateException("Unable to add song! Playlist file is not valid or variant " + variant + " doesn't exist!");
     }
