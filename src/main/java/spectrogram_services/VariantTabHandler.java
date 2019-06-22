@@ -52,7 +52,7 @@ public class VariantTabHandler extends Tab {
         File resultFile = flc.showOpenDialog(Global.getStage());
 
         if((null != resultFile)&&(resultFile.exists())){
-            //plHandler.addSong(variant, resultFile);
+            plHandler.addSongToVariant(resultFile, variant);
 
             /* Add TitledPane for it */
             TitledPane aSong = new TitledPane();

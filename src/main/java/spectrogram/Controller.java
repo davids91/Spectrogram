@@ -4,8 +4,6 @@
     import javafx.scene.control.*;
     import javafx.scene.image.ImageView;
     import javafx.stage.FileChooser;
-    import spectrogram_exceptions.InvalidPlaylistException;
-    import spectrogram_exceptions.PlaylistOverrideException;
     import spectrogram_models.Global;
     import spectrogram_services.PlaylistHandler;
     import spectrogram_services.VariantTabHandler;
@@ -46,7 +44,7 @@
                 try {
                     plHandler.openPlaylist(defPlayList);
                     playlistValidUpdateUI();
-                } catch (InvalidPlaylistException e) {
+                } catch (IllegalStateException e) {
                    userPref.put("defaultPlayList","");/* Default Playlist is invalid! Let's delete it */
                     e.printStackTrace();
                 }
@@ -65,7 +63,7 @@
             } /* else playlistHandler is in an invalid state */
         }
 
-        private void openPlaylist(File playlist) throws InvalidPlaylistException, PlaylistOverrideException {
+        private void openPlaylist(File playlist) throws IllegalStateException {
             if(null != playlist)
             {
                 if(plHandler.openPlaylist(playlist))
@@ -85,7 +83,7 @@
                 plHandler.closePlaylist();
                 try {
                     openPlaylist(resultFile);
-                } catch (InvalidPlaylistException | PlaylistOverrideException e) {
+                } catch (IllegalStateException e) {
                     playlistInvalidUpdateUI();
                     e.printStackTrace();
                 }
@@ -98,7 +96,7 @@
             File resultFile = new File(defaultPlaylistPath);
             try {
                 openPlaylist(resultFile);
-            } catch (InvalidPlaylistException | PlaylistOverrideException e) {
+            } catch (IllegalStateException e) {
                 playlistInvalidUpdateUI();
                 e.printStackTrace();
             }
@@ -125,7 +123,7 @@
                 try {
                     plHandler.openPlaylist(resultFile);
                     playlistValidUpdateUI();
-                } catch (InvalidPlaylistException e) {
+                } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
             }else throw new IOException("Unable to create new playlist file!");
@@ -142,7 +140,7 @@
                 ArrayList<String> variants = null;
                 try {
                     variants = plHandler.getPlaylistVariants();
-                } catch (InvalidPlaylistException e) {
+                } catch (IllegalStateException e) {
                     e.printStackTrace();
                 }
 
@@ -178,7 +176,7 @@
 
                     reloadVariants();
 
-                } catch (InvalidPlaylistException e) {
+                } catch (IllegalStateException e) {
                     e.printStackTrace();
                     openDefaultBtn.setDisable(true);
                     playlistInvalidUpdateUI();
@@ -210,7 +208,7 @@
                     userPref.put("defaultPlayList", path);
                     defaultPlaylistPath = path;
                     playlistValidUpdateUI();
-                } catch (InvalidPlaylistException e) {
+                } catch (IllegalStateException e) {
                     playlistInvalidUpdateUI();
                     e.printStackTrace();
                 }

@@ -4,8 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import spectrogram_exceptions.InvalidPlaylistException;
-import spectrogram_exceptions.PlaylistOverrideException;
 import spectrogram_models.PlaylistStructure;
 
 import java.io.*;
@@ -41,7 +39,7 @@ public class PlaylistHandler {
         }else return false;
     }
 
-    public ArrayList<String> getPlaylistVariants() throws InvalidPlaylistException {
+    public ArrayList<String> getPlaylistVariants() throws IllegalStateException {
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) {
             ArrayList<String> variants = new ArrayList();
 
@@ -54,7 +52,7 @@ public class PlaylistHandler {
                 }/* else might be a Control key, might be a simple property */
             }
             return variants;
-        }else throw new InvalidPlaylistException("Unable to read back playlist variants");
+        }else throw new IllegalStateException("Unable to read back playlist variants, because playlist is not valid!");
     }
 
     private void flush()
@@ -70,7 +68,7 @@ public class PlaylistHandler {
         } /* else Object state is not valid */
     }
 
-    private void initializePlaylist() throws PlaylistOverrideException {
+    private void initializePlaylist() throws IllegalStateException {
         if(
             (Validity.unknownFormat.ordinal() <= isPlaylistValid().ordinal())
             &&(Validity.valid.ordinal() >= isPlaylistValid().ordinal())
@@ -84,7 +82,7 @@ public class PlaylistHandler {
         }
         else
         { /* Should not override a valid playlist */
-            throw new PlaylistOverrideException();
+            throw new IllegalStateException("Unable to initialize playlist because it's not valid!");
         }
     }
 
@@ -95,9 +93,10 @@ public class PlaylistHandler {
             ||(0 < playlistFile.length()) /* There is anything to parse */
         )
         {
-            try {
+            try (
                 InputStream is = new FileInputStream(playlistFile);
                 BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+            ){
                 String line = buf.readLine();
                 StringBuilder sb = new StringBuilder();
                 while(line != null) { sb.append(line).append("\n"); line = buf.readLine(); }
@@ -120,7 +119,17 @@ public class PlaylistHandler {
         }
     }
 
-    public boolean openPlaylist(File playlist) throws InvalidPlaylistException, JsonSyntaxException
+    public void addSongToVariant(File Song, String variant){
+        if(
+                (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
+                &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
+        ){
+
+            flush();
+        }else throw new IllegalStateException("Unable to add song! Playlist file is not valid or variant " + variant + " doesn't exist!");
+    }
+
+    public boolean openPlaylist(File playlist) throws IllegalStateException, JsonSyntaxException
     {
 
         this.playlistFile = playlist; /* Update the Playlist */
@@ -130,9 +139,9 @@ public class PlaylistHandler {
         { /* unable to parse playlist --> Playlist is empty / new */
             try {
                 initializePlaylist();
-            } catch (PlaylistOverrideException e) {
+            } catch (IllegalStateException e) {
                 e.printStackTrace();
-                throw new InvalidPlaylistException("Unable to Initialize playlist!");
+                throw new IllegalStateException("Unable to Initialize playlist!");
             }
         }
         return (Validity.invalidFormat.ordinal() < isPlaylistValid().ordinal());
@@ -191,25 +200,21 @@ public class PlaylistHandler {
         playlistFile = null;
     }
 
-    public String getPlayListPath() throws InvalidPlaylistException {
+    public String getPlayListPath() throws IllegalStateException {
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal())
         {
             return playlistFile.getPath();
-        }
-        else
-        {
-            throw new InvalidPlaylistException("Unable to determine playlist path");
+        }else{
+            throw new IllegalStateException("Unable to determine playlist path!");
         }
     }
 
-    public String getPlayListName() throws InvalidPlaylistException {
+    public String getPlayListName() throws IllegalStateException {
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal())
         {
             return playlistFile.getName();
-        }
-        else
-        {
-            throw new InvalidPlaylistException();
+        }else{
+            throw new IllegalStateException("Unable to determine playlist name!");
         }
     }
 }
