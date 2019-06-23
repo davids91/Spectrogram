@@ -19,9 +19,11 @@ public class CacheFileHandler {
                 cache = new CacheFileStructure();
             }else{
                 FileInputStream f = new FileInputStream(cacheFile);
-                ObjectInputStream s = new ObjectInputStream(f);
-                cache =  (CacheFileStructure) s.readObject();
-                s.close();
+                if(0 < cacheFile.length()){
+                    ObjectInputStream s = new ObjectInputStream(f);
+                    cache = (CacheFileStructure) s.readObject();
+                    s.close();
+                }else cache = new CacheFileStructure();
             }
         }else throw new FileNotFoundException("Unable to create the Cache file");
     }
@@ -35,9 +37,24 @@ public class CacheFileHandler {
             s.writeObject(cache);
             s.flush();
             s.close();
+            cacheFile = file;
             return true;
         }else return false; /* Unable to write out HashMap */
     }
+
+    /* @brief: Writes out the whole of the cache to the given File
+     * @returns: operation success */
+    public boolean writeCacheToFile() throws IOException {
+        if(null != cacheFile){
+            FileOutputStream f = new FileOutputStream(cacheFile);
+            ObjectOutputStream s = new ObjectOutputStream(f);
+            s.writeObject(cache);
+            s.flush();
+            s.close();
+            return true;
+        }else return false; /* Unable to write out HashMap */
+    }
+
 
     public boolean moveCacheTo(File destFile){
         if(
@@ -57,8 +74,19 @@ public class CacheFileHandler {
         }else return false; /* Unable to move File! */
     }
 
-    public Image getCachedSpectrogram(File mp3File) throws IOException {
-        return cache.getFile(mp3File);
+    public Image getCachedSpectrogram(File mp3File) throws FileNotFoundException {
+        Image ret;
+        if(!cache.hasFile(mp3File)){
+            ret = cache.getFile(mp3File);
+            try {
+                writeCacheToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            ret = cache.getFile(mp3File);
+        }
+        return  ret;
     }
 
     /* TODO: New Thread for saving CacheFile */

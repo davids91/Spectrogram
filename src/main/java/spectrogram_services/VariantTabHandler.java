@@ -1,12 +1,9 @@
 package spectrogram_services;
 
 import com.google.gson.JsonObject;
-import com.sun.jndi.toolkit.url.Uri;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import spectrogram_models.Global;
 import spectrogram_models.SongStructure;
@@ -14,12 +11,7 @@ import spectrogram_models.VariantTabStructure;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.Map;
 
 public class VariantTabHandler extends Tab {
@@ -52,7 +44,7 @@ public class VariantTabHandler extends Tab {
                     );
                 }
 
-            } catch (InterruptedException | FileNotFoundException e) {
+            } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
 
@@ -83,7 +75,12 @@ public class VariantTabHandler extends Tab {
             plHandler.addSongToVariant(resultFile, variant);
 
             /* Add TitledPane for it */
-            TitledPane aSong = SongStructure.getSongTitledPane(resultFile);
+            TitledPane aSong = null;
+            try {
+                aSong = SongStructure.getSongTitledPane(resultFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             /* Add Graphic for song */
             mainAccordion.getPanes().add(0, aSong);

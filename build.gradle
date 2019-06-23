@@ -19,6 +19,7 @@ dependencies {
     compile group: 'org.datavec', name: 'datavec-data-audio', version: '1.0.0-beta3'
     compile group: 'com.googlecode.soundlibs', name: 'mp3spi', version: '1.9.5.4' /* MP3 read */
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    compile group: 'org.openjfx', name: 'javafx-swing', version: '11-ea+24'
 }
 
 javafx {

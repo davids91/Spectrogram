@@ -4,18 +4,18 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import spectrogram_services.WavConverter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class SongStructure {
 
     public static Image getImageFromFile(File file) throws FileNotFoundException {
-        return WavConverter.imageFromMp3(file);
+        return Global.getCache().getCachedSpectrogram(file);
     }
 
-    public static TitledPane getSongTitledPane(File songFile) throws FileNotFoundException {
+    public static TitledPane getSongTitledPane(File songFile) throws IOException {
         TitledPane songPane = new TitledPane();
         songPane.setText(songFile.getName());
 
