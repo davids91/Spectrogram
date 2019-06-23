@@ -1,7 +1,7 @@
 package spectrogram_services;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.sun.jndi.toolkit.url.Uri;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
@@ -9,19 +9,25 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import spectrogram_models.Global;
-import spectrogram_services.PlaylistHandler;
-import spectrogram_services.WavConverter;
+import spectrogram_models.SongStructure;
+import spectrogram_models.VariantTabStructure;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Map;
 
 public class VariantTabHandler extends Tab {
 
-    private String variant = "";
+    private String variant;
     private JsonObject varObj = null;
-    private PlaylistHandler plHandler = null;
-    private Accordion mainAccordion = null;
+    private PlaylistHandler plHandler;
+    private Accordion mainAccordion;
 
     public VariantTabHandler(PlaylistHandler plHandler, String variant){
         setText(variant);
@@ -32,32 +38,34 @@ public class VariantTabHandler extends Tab {
             setOnCloseRequest(removeVariantRequest);
 
             /* Add an Accordion and a titledPane for songs and to add new Music */
-            mainAccordion = new Accordion();
-            TitledPane addMusicTitledPane = new TitledPane();
+            mainAccordion = VariantTabStructure.createVariantAccordion();
 
             try {
                 varObj = plHandler.getVariant(variant);
 
                 /* Load in the songs from the variants */
-                TitledPane songPane = null;
                 for(Map.Entry song: varObj.entrySet()){
-                    songPane = new TitledPane();
-                    songPane.setText(song.getValue().toString());
-                    mainAccordion.getPanes().add(songPane);
-                    /* TODO: Load in song image */
+                    mainAccordion.getPanes().add(
+                        SongStructure.getSongTitledPane(
+                            new File(song.getValue().toString().trim().replaceAll("\"",""))
+                        )
+                    );
                 }
 
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | FileNotFoundException e) {
                 e.printStackTrace();
             }
 
             /* Add button for adding music */
-            mainAccordion.getPanes().add(addMusicTitledPane);
-            Button addMusicBtn = new Button();
-            addMusicBtn.setId(variant + "addMusicBtn");
-            addMusicBtn.setText("+");
-            addMusicTitledPane.setGraphic(addMusicBtn);
-            addMusicBtn.setOnAction(actionEvent -> addSong());
+            VariantTabStructure.getAddSongBtn(
+                VariantTabStructure.createAddSongTitledPane(mainAccordion)
+            ).setOnAction(actionEvent -> {
+                try {
+                    addSong();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            });
 
             /* Set the content of the Tab */
             this.setContent(mainAccordion);
@@ -65,7 +73,7 @@ public class VariantTabHandler extends Tab {
         }else throw new UnsupportedOperationException("Standalone VariantHandler not supported!");
     }
 
-    private void addSong(){
+    private void addSong() throws FileNotFoundException {
         FileChooser flc = new FileChooser();
         flc.setTitle("Add song to variant " + variant);
         flc.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Musica mp3", "*.mp3"));
@@ -75,21 +83,10 @@ public class VariantTabHandler extends Tab {
             plHandler.addSongToVariant(resultFile, variant);
 
             /* Add TitledPane for it */
-            TitledPane aSong = new TitledPane();
-            aSong.setText(resultFile.getName());
-
-            ImageView imgV;
+            TitledPane aSong = SongStructure.getSongTitledPane(resultFile);
 
             /* Add Graphic for song */
-            try {
-                imgV = new ImageView(WavConverter.imageFromMp3(resultFile));
-                AnchorPane lofasz = new AnchorPane();
-                lofasz.getChildren().add(imgV);
-                aSong.setContent(lofasz);
-                mainAccordion.getPanes().add(0, aSong);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            mainAccordion.getPanes().add(0, aSong);
 
         }
 

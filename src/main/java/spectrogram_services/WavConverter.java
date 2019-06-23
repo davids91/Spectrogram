@@ -21,13 +21,11 @@ import java.net.URL;
 public class WavConverter {
 
     public static Image imageFromMp3(File mp3File) throws FileNotFoundException {
-        //InputStream is = getClass().getResourceAsStream("/sounds/CambioDolor.wav");
         InputStream is;
         if(mp3File.exists())
         {
             File resultFile = null;
             try {
-                //WavConverter.createWavFromMp3(getClass().getResource("/sounds/winxp.mp3"), getClass().getResource("/sounds/winxp.wav"));
                 resultFile = File.createTempFile("what","isthis");
                 WavConverter.wavFromMp3(mp3File, resultFile);
             } catch (UnsupportedAudioFileException | IOException | URISyntaxException e) {
@@ -68,7 +66,7 @@ public class WavConverter {
 
             System.out.println("Done! Image size is: " + x + "," + y);
             return resImg;
-        }else throw new FileNotFoundException("File " + mp3File.getPath() + " doesn't exist!");
+        }else throw new FileNotFoundException("File " + mp3File.getPath() + " doesn't exist or reserved!");
     }
 
 

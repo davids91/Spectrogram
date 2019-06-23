@@ -7,6 +7,9 @@ import com.google.gson.JsonSyntaxException;
 import spectrogram_models.PlaylistStructure;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -135,13 +138,13 @@ public class PlaylistHandler {
         }
     }
 
-    public void addSongToVariant(File song, String variant){
+    public void addSongToVariant(File song, String variant) throws FileNotFoundException {
         if(
                 (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
                 &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
         ){
             JsonObject varObj = playlistObj.getAsJsonObject(variant);
-            varObj.addProperty("" + varObj.size(), song.getPath());
+            varObj.addProperty("" + varObj.size(), song.getAbsolutePath());
             flush();
         }else throw new IllegalStateException("Unable to add song! Playlist file is not valid or variant " + variant + " doesn't exist!");
     }
