@@ -74,7 +74,7 @@ public class CacheFileHandler {
         }else return false; /* Unable to move File! */
     }
 
-    public Image getCachedSpectrogram(File mp3File) throws FileNotFoundException {
+    public Image getCachedSpectrogram(File mp3File) throws IOException {
         Image ret;
         if(!cache.hasFile(mp3File)){
             ret = cache.getFile(mp3File);

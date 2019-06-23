@@ -1,8 +1,8 @@
 package spectrogram_models;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
-import javafx.embed.swing.SwingFXUtils;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

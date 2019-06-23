@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class SongStructure {
 
-    public static Image getImageFromFile(File file) throws FileNotFoundException {
+    public static Image getImageFromFile(File file) throws IOException {
         return Global.getCache().getCachedSpectrogram(file);
     }
 

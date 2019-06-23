@@ -15,13 +15,13 @@ public class CacheFileStructure extends HashMap<String, SerializableImage> imple
             else return false;
     }
 
-    public Image putFile(File mp3File) throws FileNotFoundException {
+    public Image putFile(File mp3File) throws IOException {
         Image cachedImg = WavConverter.imageFromMp3(mp3File);
         put(mp3File.getAbsolutePath(),new SerializableImage(cachedImg));
         return cachedImg;
     }
 
-    public Image getFile(File mp3File) throws FileNotFoundException {
+    public Image getFile(File mp3File) throws IOException {
         if(hasFile(mp3File)){
             return this.get(mp3File.getAbsolutePath()).getImage();
         }else{
