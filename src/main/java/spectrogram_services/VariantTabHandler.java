@@ -67,6 +67,8 @@ public class VariantTabHandler extends Tab {
         }else throw new UnsupportedOperationException("Standalone VariantHandler not supported!");
     }
 
+    /* TODO: Last used Folder */
+    /* TODO: Add multiple songs at once */
     private void addSong() throws FileNotFoundException {
         FileChooser flc = new FileChooser();
         flc.setTitle("Add song to variant " + variant);

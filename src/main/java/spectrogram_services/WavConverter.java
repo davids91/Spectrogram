@@ -35,32 +35,30 @@ public class WavConverter {
             double[][] spData = sptr.getNormalizedSpectrogramData();
             WritableImage resImg = new WritableImage(spData.length,spData[0].length);
             PixelWriter pxWr = resImg.getPixelWriter();
-
-            int x = 0, y = 0;
-            boolean redRow = false;
-            double fillage = 0;
+            double localIntensity = 0.0;
+            int x = 0, y = 0, currentIntensity = 0, currentEmphasis = 0;
             for(double[] col : spData) /* one sample time */
             {
-                fillage = 0;
                 y = 0;
+                localIntensity = col[0];
                 for(double item : col)
                 {
-                    if(fillage <= (spData[0].length) * 0.2)
-                    { /* quite filled time */
-                        resImg.getPixelWriter().setColor(x,y, Color.rgb((int)(item * 255),0,0));
-                    }
-                    else
-                    { /* not quite filled time */
-                        resImg.getPixelWriter().setColor(x,y, Color.rgb((int)(item * 255),(int)(item * 255),(int)(item * 255)));
-                    }
-                    fillage += item;
-                    //System.out.println("data: " + item + "\n");
+                    currentIntensity = Math.min(255,Math.max(0,(int)((item + localIntensity) * 128)));
+                    if(220 < currentIntensity) currentEmphasis = 128;
+                    else currentEmphasis = 0;
+                    pxWr.setColor(x,y,
+                        Color.rgb(
+                            currentIntensity,
+                            currentIntensity/3 + currentEmphasis,
+                            currentEmphasis
+                        )
+                    );
+                    localIntensity = localIntensity*0.3 + item*0.7;
                     y++;
                 }
                 x++;
             }
 
-            System.out.println("Done! Image size is: " + x + "," + y);
             return resImg;
         }else throw new FileNotFoundException("File " + mp3File.getPath() + " doesn't exist or reserved!");
     }

@@ -57,6 +57,7 @@ public class SongStructure {
 
         /* Alignment */
         theImgV.fitHeightProperty().bind(songPane.heightProperty());
+        alignPane.setMinHeight(800); /* TODO: Set a static size, display image correctly */
         alignPane.setFitToWidth(true);
         alignPane.setFitToHeight(true);
 
