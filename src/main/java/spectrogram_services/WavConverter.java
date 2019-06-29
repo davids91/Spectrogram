@@ -1,19 +1,15 @@
 package spectrogram_services;
 
-import javafx.event.ActionEvent;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import org.datavec.audio.Wave;
 import org.datavec.audio.extension.Spectrogram;
 
 import javax.sound.sampled.*;
 import java.io.*;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 /* @OVERVIEW
  * Converts any audio file to a wav format for Datavec to read

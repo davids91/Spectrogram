@@ -1,8 +1,5 @@
 package spectrogram_models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum PlaylistStructure {
 
     netLocation,

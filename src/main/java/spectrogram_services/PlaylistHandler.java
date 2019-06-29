@@ -7,9 +7,6 @@ import com.google.gson.JsonSyntaxException;
 import spectrogram_models.PlaylistStructure;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map;
 

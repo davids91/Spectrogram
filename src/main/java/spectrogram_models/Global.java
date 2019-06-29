@@ -1,6 +1,5 @@
 package spectrogram_models;
 
-import javafx.scene.Parent;
 import javafx.stage.Stage;
 import spectrogram.Main;
 import spectrogram_services.CacheFileHandler;

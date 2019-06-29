@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import spectrogram_models.Global;
+import spectrogram_models.PlayListAccordion;
 import spectrogram_models.SongStructure;
 import spectrogram_models.VariantTabStructure;
 
@@ -19,7 +20,7 @@ public class VariantTabHandler extends Tab {
     private String variant;
     private JsonObject varObj = null;
     private PlaylistHandler plHandler;
-    private Accordion mainAccordion;
+    private PlayListAccordion mainAccordion;
 
     public VariantTabHandler(PlaylistHandler plHandler, String variant){
         setText(variant);
@@ -39,7 +40,8 @@ public class VariantTabHandler extends Tab {
                 for(Map.Entry song: varObj.entrySet()){
                     mainAccordion.getPanes().add(
                         SongStructure.getSongTitledPane(
-                            new File(song.getValue().toString().trim().replaceAll("\"",""))
+                            new File(song.getValue().toString().trim().replaceAll("\"","")),
+                            mainAccordion
                         )
                     );
                 }
@@ -77,7 +79,7 @@ public class VariantTabHandler extends Tab {
             /* Add TitledPane for it */
             TitledPane aSong = null;
             try {
-                aSong = SongStructure.getSongTitledPane(resultFile);
+                aSong = SongStructure.getSongTitledPane(resultFile,mainAccordion);
             } catch (IOException e) {
                 e.printStackTrace();
             }

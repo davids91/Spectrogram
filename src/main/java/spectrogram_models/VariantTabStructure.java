@@ -3,11 +3,7 @@ package spectrogram_models;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.TitledPane;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Random;
 
 public class VariantTabStructure {
@@ -29,8 +25,8 @@ public class VariantTabStructure {
         return addMusicTitledPane;
     }
 
-    public static Accordion createVariantAccordion(){
-        Accordion mainAccordion = new Accordion();
+    public static PlayListAccordion createVariantAccordion(){
+        PlayListAccordion mainAccordion = new PlayListAccordion();
         return mainAccordion;
     }
 
