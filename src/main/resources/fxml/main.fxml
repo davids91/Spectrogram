@@ -6,7 +6,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<SplitPane dividerPositions="0.2, 0.25, 0.99" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="spectrogram.Controller">
+<SplitPane dividerPositions="0.2140468227424749, 0.26588628762541805, 0.9531772575250836" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="spectrogram.Controller">
   <items>
       <HBox prefHeight="125.0" prefWidth="926.0">
          <children>
@@ -41,7 +41,7 @@
             <Slider maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
          </children>
       </HBox>
-      <AnchorPane prefHeight="223.0" prefWidth="720.0">
+      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
          <children>
             <TabPane fx:id="variantTabPane" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <tabs>

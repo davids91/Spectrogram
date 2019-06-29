@@ -62,7 +62,7 @@ public class VariantTabHandler extends Tab {
             });
 
             /* Set the content of the Tab */
-            this.setContent(mainAccordion);
+            this.setContent(VariantTabStructure.createPlaylistContent(mainAccordion));
 
         }else throw new UnsupportedOperationException("Standalone VariantHandler not supported!");
     }

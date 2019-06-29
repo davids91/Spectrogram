@@ -19,6 +19,7 @@ public class SongStructure {
     public static HBox getSongControls(PlayListAccordion mainAccordion){
         HBox controlBox = new HBox();
 
+        /* TODO: Next/Previous from this index */
         Button prevBtn = new Button();
         prevBtn.setText("<<");
         prevBtn.setOnAction((actionEvent)->mainAccordion.setExpandedPane(
@@ -56,13 +57,10 @@ public class SongStructure {
         songPane.setContent(alignPane);
 
         /* Alignment */
-        theImgV.fitHeightProperty().bind(songPane.heightProperty());
-        alignPane.setMinHeight(800); /* TODO: Set a static size, display image correctly */
-        alignPane.setFitToWidth(true);
+        /* TODO: Set a static size, display image correctly */
+        theImgV.setFitHeight(300);
         alignPane.setFitToHeight(true);
-
         alignPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
 
         return songPane;
     }

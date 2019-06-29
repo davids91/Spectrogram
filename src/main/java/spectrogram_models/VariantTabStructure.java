@@ -2,6 +2,7 @@ package spectrogram_models;
 
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TitledPane;
 
 import java.util.Random;
@@ -28,6 +29,14 @@ public class VariantTabStructure {
     public static PlayListAccordion createVariantAccordion(){
         PlayListAccordion mainAccordion = new PlayListAccordion();
         return mainAccordion;
+    }
+
+    public static ScrollPane createPlaylistContent(PlayListAccordion mainAccordion){
+        ScrollPane scrPane = new ScrollPane(mainAccordion);
+        scrPane.setFitToWidth(true);
+        scrPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        return scrPane;
     }
 
 }
