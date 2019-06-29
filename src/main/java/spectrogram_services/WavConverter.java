@@ -36,7 +36,7 @@ public class WavConverter {
             WritableImage resImg = new WritableImage(spData.length,spData[0].length);
             PixelWriter pxWr = resImg.getPixelWriter();
             double localIntensity = 0.0;
-            int x = 0, y = 0, currentIntensity = 0, currentEmphasis = 0;
+            int x = 0, y = 0, currentIntensity = 0, currentEmphasisMed = 0, currentEmphasisHigh = 0;
             for(double[] col : spData) /* one sample time */
             {
                 y = 0;
@@ -44,16 +44,19 @@ public class WavConverter {
                 for(double item : col)
                 {
                     currentIntensity = Math.min(255,Math.max(0,(int)((item + localIntensity) * 128)));
-                    if(200 < currentIntensity) currentEmphasis = 128;
-                    else currentEmphasis = 0; /* TODO: Emphasis in 2 phases*/
+
+                    if(190 < currentIntensity) currentEmphasisMed = 64;
+                    else currentEmphasisMed = 0;
+                    if(200 < currentIntensity) currentEmphasisHigh = 64;
+                    else currentEmphasisHigh = 0;
                     pxWr.setColor(x,y,
                         Color.rgb(
                             currentIntensity,
-                            currentIntensity/3 + currentEmphasis,
-                            currentEmphasis
+                            currentIntensity/3 + currentEmphasisHigh + currentEmphasisMed,
+                            currentEmphasisHigh + currentEmphasisMed
                         )
                     );
-                    localIntensity = localIntensity*0.3 + item*0.7;
+                    localIntensity = localIntensity*0.9 + item*0.8;
                     y++;
                 }
                 x++;

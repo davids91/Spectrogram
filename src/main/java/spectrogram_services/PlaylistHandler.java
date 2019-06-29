@@ -34,6 +34,13 @@ public class PlaylistHandler {
         return ret;
     }
 
+    public String getLastSelectedVariant() throws IllegalStateException{
+        if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
+        {
+            return playlistObj.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).toString();
+        }else throw new IllegalStateException("Unable to determine last selected Variant, playlist not valid!");
+    }
+
     public boolean selectVariant(String variant)
     {
         if(

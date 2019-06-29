@@ -5,6 +5,7 @@
     import javafx.scene.image.ImageView;
     import javafx.stage.FileChooser;
     import spectrogram_models.Global;
+    import spectrogram_models.VariantTab;
     import spectrogram_services.PlaylistHandler;
     import spectrogram_services.VariantTabHandler;
 
@@ -144,13 +145,16 @@
                     e.printStackTrace();
                 }
 
+                VariantTab lastSelectedVariant = null;
                 for(String variant : variants)
                 {
-                    System.out.println("Adding Variant: " + variant);
                     VariantTabHandler tabHandler = new VariantTabHandler(plHandler,variant);
+                    if(plHandler.getLastSelectedVariant().equals(variant)){
+                        lastSelectedVariant = tabHandler.getTab();
+                    }
                     variantTabPane.getTabs().add(tabHandler.getTab());
-                    variantTabPane.getSelectionModel().selectLast();
                 }
+                variantTabPane.getSelectionModel().select(lastSelectedVariant);
             }
         }
 

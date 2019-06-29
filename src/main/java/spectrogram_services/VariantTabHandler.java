@@ -23,6 +23,7 @@ public class VariantTabHandler{
     private Accordion mainAccordion;
 
     /* TODO: Drag&&Drop rearranging the songs */
+    /* TODO: Save Last Selected Variant */
 
     public VariantTabHandler(PlaylistHandler plHandler, String variant){
         tab = new VariantTab();
