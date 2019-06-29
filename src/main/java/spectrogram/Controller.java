@@ -147,9 +147,8 @@
                 for(String variant : variants)
                 {
                     System.out.println("Adding Variant: " + variant);
-                    VariantTabHandler tab = new VariantTabHandler(plHandler,variant);
-                    tab.setId("variant" + new Random().nextInt());
-                    variantTabPane.getTabs().add(tab);
+                    VariantTabHandler tabHandler = new VariantTabHandler(plHandler,variant);
+                    variantTabPane.getTabs().add(tabHandler.getTab());
                     variantTabPane.getSelectionModel().selectLast();
                 }
             }

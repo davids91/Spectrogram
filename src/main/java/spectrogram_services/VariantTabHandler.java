@@ -6,32 +6,36 @@ import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import spectrogram_models.Global;
-import spectrogram_models.PlayListAccordion;
-import spectrogram_models.SongStructure;
-import spectrogram_models.VariantTabStructure;
+import spectrogram_models.SongPane;
+import spectrogram_models.VariantTab;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Map;
+import java.util.Random;
 
-public class VariantTabHandler extends Tab {
+public class VariantTabHandler{
 
     private String variant;
     private JsonObject varObj = null;
+    private VariantTab tab = null;
     private PlaylistHandler plHandler;
-    private PlayListAccordion mainAccordion;
+    private Accordion mainAccordion;
+
+    /* TODO: Drag&&Drop rearranging the songs */
 
     public VariantTabHandler(PlaylistHandler plHandler, String variant){
-        setText(variant);
+        tab = new VariantTab();
+        tab.setId(variant + "Tab" +  new Random().nextInt());
+        tab.setText(variant);
         this.variant = variant;
-        setClosable(true);
+        tab.setClosable(true);
         if(null != plHandler){
             this.plHandler = plHandler;
-            setOnCloseRequest(removeVariantRequest);
+            tab.setOnCloseRequest(removeVariantRequest);
 
             /* Add an Accordion and a titledPane for songs and to add new Music */
-            mainAccordion = VariantTabStructure.createVariantAccordion();
+            mainAccordion = new Accordion();
 
             try {
                 varObj = plHandler.getVariant(variant);
@@ -39,20 +43,19 @@ public class VariantTabHandler extends Tab {
                 /* Load in the songs from the variants */
                 for(Map.Entry song: varObj.entrySet()){
                     mainAccordion.getPanes().add(
-                        SongStructure.getSongTitledPane(
-                            new File(song.getValue().toString().trim().replaceAll("\"","")),
-                            mainAccordion
+                        new SongPane(
+                            new File(song.getValue().toString().trim().replaceAll("\"",""))
                         )
                     );
                 }
 
-            } catch (InterruptedException | IOException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             /* Add button for adding music */
-            VariantTabStructure.getAddSongBtn(
-                VariantTabStructure.createAddSongTitledPane(mainAccordion)
+            VariantTab.getAddSongBtn(
+                VariantTab.createAddSongTitledPane(mainAccordion)
             ).setOnAction(actionEvent -> {
                 try {
                     addSong();
@@ -62,9 +65,13 @@ public class VariantTabHandler extends Tab {
             });
 
             /* Set the content of the Tab */
-            this.setContent(VariantTabStructure.createPlaylistContent(mainAccordion));
+            tab.setContent(VariantTab.createPlaylistContent(mainAccordion));
 
         }else throw new UnsupportedOperationException("Standalone VariantHandler not supported!");
+    }
+
+    public VariantTab getTab(){
+        return tab;
     }
 
     /* TODO: Last used Folder */
@@ -78,17 +85,8 @@ public class VariantTabHandler extends Tab {
         if((null != resultFile)&&(resultFile.exists())){
             plHandler.addSongToVariant(resultFile, variant);
 
-            /* Add TitledPane for it */
-            TitledPane aSong = null;
-            try {
-                aSong = SongStructure.getSongTitledPane(resultFile,mainAccordion);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
             /* Add Graphic for song */
-            mainAccordion.getPanes().add(0, aSong);
-
+            mainAccordion.getPanes().add(0, new SongPane(resultFile));
         }
 
     }

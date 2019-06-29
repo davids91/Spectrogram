@@ -1,13 +1,11 @@
 package spectrogram_models;
 
-import javafx.scene.control.Accordion;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 
 import java.util.Random;
 
-public class VariantTabStructure {
+/* TODO: play Button Functionality */
+public class VariantTab extends Tab {
     public static Button makeAddSongBtn(){
         Button addMusicBtn = new Button();
         addMusicBtn.setId("addMusicBtn" + new Random().nextInt());
@@ -26,12 +24,7 @@ public class VariantTabStructure {
         return addMusicTitledPane;
     }
 
-    public static PlayListAccordion createVariantAccordion(){
-        PlayListAccordion mainAccordion = new PlayListAccordion();
-        return mainAccordion;
-    }
-
-    public static ScrollPane createPlaylistContent(PlayListAccordion mainAccordion){
+    public static ScrollPane createPlaylistContent(Accordion mainAccordion){
         ScrollPane scrPane = new ScrollPane(mainAccordion);
         scrPane.setFitToWidth(true);
         scrPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);

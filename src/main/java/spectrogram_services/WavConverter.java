@@ -44,8 +44,8 @@ public class WavConverter {
                 for(double item : col)
                 {
                     currentIntensity = Math.min(255,Math.max(0,(int)((item + localIntensity) * 128)));
-                    if(220 < currentIntensity) currentEmphasis = 128;
-                    else currentEmphasis = 0;
+                    if(200 < currentIntensity) currentEmphasis = 128;
+                    else currentEmphasis = 0; /* TODO: Emphasis in 2 phases*/
                     pxWr.setColor(x,y,
                         Color.rgb(
                             currentIntensity,
