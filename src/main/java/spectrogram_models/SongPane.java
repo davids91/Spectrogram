@@ -11,6 +11,7 @@ public class SongPane extends TitledPane{
 
     private ImageView imgV = null;
     private ScrollPane scrP = null;
+    private Separator fill = new Separator();
 
     private File songFile = null;
     private boolean loaded = false;
@@ -42,9 +43,7 @@ public class SongPane extends TitledPane{
         }
     }
 
-    public void hide(){
-        setContent(null);
-    }
+    public void hide(){ setContent(fill); }
 
     public HBox getSongControls(){
         HBox controlBox = new HBox();
@@ -59,7 +58,6 @@ public class SongPane extends TitledPane{
                 spectroBtn.setText("X");
                 try {
                     loadImage(); /* TODO: Use another thread with Progressbar */
-                    ((Accordion)this.getParent()).setExpandedPane(this); /* TODO: un-ghetto this */
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
