@@ -11,6 +11,7 @@ import spectrogram_models.VariantTab;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -76,20 +77,21 @@ public class VariantTabHandler{
     }
 
     /* TODO: Last used Folder */
-    /* TODO: Add multiple songs at once */
     private void addSong() throws FileNotFoundException {
         FileChooser flc = new FileChooser();
         flc.setTitle("Add song to variant " + variant);
         flc.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Musica mp3", "*.mp3"));
-        File resultFile = flc.showOpenDialog(Global.getStage());
+        List<File> resultFiles = flc.showOpenMultipleDialog(Global.getStage());
 
-        if((null != resultFile)&&(resultFile.exists())){
-            plHandler.addSongToVariant(resultFile, variant);
+        for(File resultFile : resultFiles){
+            if((null != resultFile)&&(resultFile.exists())){
+                plHandler.addSongToVariant(resultFile, variant);
 
-            /* Add Graphic for song */
-            mainAccordion.getPanes().add(0, new SongPane(resultFile));
+                /* Add Graphic for song */
+                mainAccordion.getPanes().add(0, new SongPane(resultFile));
+            }
+
         }
-
     }
 
     private EventHandler<Event> removeVariantRequest = (event) -> {

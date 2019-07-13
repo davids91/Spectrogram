@@ -56,7 +56,7 @@ public class WavConverter {
                             currentEmphasisHigh + currentEmphasisMed
                         )
                     );
-                    localIntensity = localIntensity*0.9 + item*0.8;
+                    localIntensity = localIntensity*0.33 + item*0.72;
                     y++;
                 }
                 x++;
