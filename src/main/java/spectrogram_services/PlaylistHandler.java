@@ -42,7 +42,7 @@ public class PlaylistHandler {
         }else throw new IllegalStateException("Unable to determine last selected Variant, playlist not valid!");
     }
 
-    public boolean selectVariant(String variant)
+    private boolean selectVariant(String variant)
     {
         if(
         (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
@@ -117,7 +117,7 @@ public class PlaylistHandler {
         {
             try (
                 InputStream is = new FileInputStream(playlistFile);
-                BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+                BufferedReader buf = new BufferedReader(new InputStreamReader(is))
             ){
                 String line = buf.readLine();
                 StringBuilder sb = new StringBuilder();
@@ -141,7 +141,7 @@ public class PlaylistHandler {
         }
     }
 
-    void addSongToVariant(File song, String variant) throws FileNotFoundException {
+    void addSongToVariant(File song, String variant) {
         if(
                 (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
                 &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
@@ -208,13 +208,9 @@ public class PlaylistHandler {
     }
 
     boolean removeVariant(String variant){
-        if(Validity.emptyList.ordinal() < isPlaylistValid().ordinal()){
-            if(
-                (!PlaylistStructure.isControlKey(variant))/* The item is not a Control key */
-                &&(null != playlistObj.remove(variant))/* The item exists in the playlist as a Variant */
-            ){
-                return true;
-            } else /* The variant doesn't exist or a control key is being removed */ return false;
+        if(Validity.emptyList.ordinal() < isPlaylistValid().ordinal()){ /* The item exists in the playlist as a Variant */
+            return (!PlaylistStructure.isControlKey(variant))/* The item is not a Control key */
+                    && (null != playlistObj.remove(variant)); /* The variant exists */
         } /* else the playlist doesn't have any variants to remove */ return false;
     }
 

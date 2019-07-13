@@ -6,7 +6,7 @@ import java.util.Random;
 
 /* TODO: play Button Functionality */
 public class VariantTab extends Tab {
-    public static Button makeAddSongBtn(){
+    private static Button makeAddSongBtn(){
         Button addMusicBtn = new Button();
         addMusicBtn.setId("addMusicBtn" + new Random().nextInt());
         addMusicBtn.setText("+");

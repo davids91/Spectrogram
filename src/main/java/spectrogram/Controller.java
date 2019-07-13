@@ -2,7 +2,6 @@
 
     import javafx.fxml.FXML;
     import javafx.scene.control.*;
-    import javafx.scene.image.ImageView;
     import javafx.stage.FileChooser;
     import spectrogram_models.Global;
     import spectrogram_models.VariantTab;
@@ -11,14 +10,12 @@
 
     import java.io.*;
     import java.util.ArrayList;
-    import java.util.Random;
     import java.util.prefs.Preferences;
 
     public class Controller {
 
-        PlaylistHandler plHandler = new PlaylistHandler();
+        private PlaylistHandler plHandler = new PlaylistHandler();
 
-        public ImageView imgDisplay;
         public Button openDefaultBtn;
         public Label playlistNameLabel;
         public Button setPlayListBtn;

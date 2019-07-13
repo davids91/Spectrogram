@@ -9,7 +9,6 @@ import org.datavec.audio.extension.Spectrogram;
 
 import javax.sound.sampled.*;
 import java.io.*;
-import java.net.URISyntaxException;
 
 /* @OVERVIEW
  * Converts any audio file to a wav format for Datavec to read
@@ -23,11 +22,14 @@ public class WavConverter {
             File resultFile = null;
             try {
                 resultFile = File.createTempFile("what","isthis");
-                WavConverter.wavFromMp3(mp3File, resultFile);
-            } catch (UnsupportedAudioFileException | IOException | URISyntaxException e) {
+                if(!WavConverter.wavFromMp3(mp3File, resultFile)){
+                    resultFile = null;
+                }
+            } catch (UnsupportedAudioFileException | IOException e) {
                 e.printStackTrace();
             }
 
+            assert resultFile != null;
             is = new FileInputStream(resultFile);
             Wave wave = new Wave(is);
             Spectrogram sptr = new Spectrogram(wave);
@@ -35,8 +37,8 @@ public class WavConverter {
             double[][] spData = sptr.getNormalizedSpectrogramData();
             WritableImage resImg = new WritableImage(spData.length,spData[0].length);
             PixelWriter pxWr = resImg.getPixelWriter();
-            double localIntensity = 0.0;
-            int x = 0, y = 0, currentIntensity = 0, currentEmphasisMed = 0, currentEmphasisHigh = 0;
+            double localIntensity;
+            int x = 0, y, currentIntensity, currentEmphasisMed, currentEmphasisHigh;
             for(double[] col : spData) /* one sample time */
             {
                 y = 0;
@@ -45,7 +47,7 @@ public class WavConverter {
                 {
                     currentIntensity = Math.min(255,Math.max(0,(int)((item + localIntensity) * 128)));
 
-                    if(190 < currentIntensity) currentEmphasisMed = 64;
+                    if(190 < currentIntensity) currentEmphasisMed = 16;
                     else currentEmphasisMed = 0;
                     if(200 < currentIntensity) currentEmphasisHigh = 64;
                     else currentEmphasisHigh = 0;
@@ -71,7 +73,7 @@ public class WavConverter {
      * fromAudio: Audio FIle location
      * toWav: resulting Wav file location
      * */
-    public static boolean wavFromMp3(File fromAudio, File toWav) throws UnsupportedAudioFileException, IOException, URISyntaxException {
+    private static boolean wavFromMp3(File fromAudio, File toWav) throws UnsupportedAudioFileException, IOException {
         /* open stream */
         AudioInputStream mp3Stream = AudioSystem.getAudioInputStream(fromAudio);
         AudioFormat sourceFormat = mp3Stream.getFormat();
@@ -86,12 +88,6 @@ public class WavConverter {
         /* create stream that delivers the desired format */
         AudioInputStream converted = AudioSystem.getAudioInputStream(convertFormat, mp3Stream);
         /* write stream into a file with file format wav */
-        if(!toWav.exists())
-        {
-            toWav.createNewFile();
-        }
-        AudioSystem.write(converted, AudioFileFormat.Type.WAVE, toWav);
-
-        return toWav.exists();
+        return 0 < AudioSystem.write(converted, AudioFileFormat.Type.WAVE, toWav);
     }
 }
