@@ -121,7 +121,7 @@
                     (resultFile.exists()) /* File exists */
                     ||(
                         (!resultFile.exists()) /* Or can be created */
-                        &&(resultFile.createNewFile())
+                        &&( plHandler.createNewPlaylist(resultFile))
                     )
                 )
             ){

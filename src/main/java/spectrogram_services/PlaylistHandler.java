@@ -22,7 +22,7 @@ public class PlaylistHandler {
     public boolean addVariant(String variant){
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()){
             playlistObj.add(variant, new JsonObject());
-            System.out.println(playlistObj.toString());
+            playlistObj.addProperty(PlaylistStructure.lastSelectedVariant.key(), variant);
             flush();
             return true;
         }else return false;
@@ -90,22 +90,12 @@ public class PlaylistHandler {
         } /* else Object state is not valid */
     }
 
-    private void initializePlaylist() throws IllegalStateException {
-        if(
-            (Validity.unknownFormat.ordinal() <= isPlaylistValid().ordinal())
-            &&(Validity.valid.ordinal() >= isPlaylistValid().ordinal())
-        )
-        { /* playlist exists, but isn't valid */
-            /* Initialize and set up JSON object */
-            playlistObj = new JsonObject();
-
-            addVariant("default"); /* Add a default Variant */
-            flush(); /* Write JSON object out to the file */
-        }
-        else
-        { /* Should not override a valid playlist */
-            throw new IllegalStateException("Unable to initialize playlist because it's not valid!");
-        }
+    private void initializePlaylist() throws IllegalStateException, IOException {
+        /* Initialize and set up JSON object */
+        if(!playlistFile.exists())playlistFile.createNewFile();
+        playlistObj = new JsonObject();
+        addVariant("default"); /* Add a default Variant */
+        flush(); /* Write JSON object out to the file */
     }
 
     private boolean parsePlaylist()
@@ -143,18 +133,33 @@ public class PlaylistHandler {
 
     void addSongToVariant(File song, String variant) {
         if(
-                (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
-                &&(PlaylistStructure.isNotControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
+            (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
+            &&(PlaylistStructure.isNotControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
         ){
-            JsonObject varObj = playlistObj.getAsJsonObject(variant);
-            varObj.addProperty("" + varObj.size(), song.getAbsolutePath());
-            flush();
+            try {
+                JsonObject variantObject = playlistObj.getAsJsonObject(variant);
+                variantObject.add("" + variantObject.size(), PlaylistStructure.getSongObjectInto(song.getPath(),variantObject));
+                flush();
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
         }else throw new IllegalStateException("Unable to add song! Playlist file is not valid or variant " + variant + " doesn't exist!");
+    }
+
+    public boolean createNewPlaylist(File newPlaylist){
+        this.playlistFile = newPlaylist; /* Update the Playlist */
+        this.playlistObj = null;
+        try {
+            initializePlaylist();
+            return true;
+        } catch (IllegalStateException | IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public boolean openPlaylist(File playlist) throws IllegalStateException, JsonSyntaxException
     {
-
         this.playlistFile = playlist; /* Update the Playlist */
         this.playlistObj = null;
 
@@ -163,7 +168,7 @@ public class PlaylistHandler {
             System.out.println("Unable to parse playlist!");
             try {
                 initializePlaylist();
-            } catch (IllegalStateException e) {
+            } catch (IllegalStateException | IOException e) {
                 e.printStackTrace();
                 throw new IllegalStateException("Unable to Initialize playlist!");
             }
@@ -196,7 +201,11 @@ public class PlaylistHandler {
                         playlistObj.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).getAsString()
                     ).size() == 0) /* Has a size of 0 */
                 ) return Validity.emptyList;
-            }catch (NullPointerException e){ /* JSON Control Sting ot found in playlist File */
+                else if(0 < playlistObj.getAsJsonObject( /* inside the playList */
+                        /* The last used Variant */
+                        playlistObj.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).getAsString()
+                ).size()) return Validity.valid;
+            }catch (NullPointerException e){ /* JSON Control Sting not found in playlist File */
                 return Validity.invalidFormat;
             }
         }else return Validity.invalidFormat;
