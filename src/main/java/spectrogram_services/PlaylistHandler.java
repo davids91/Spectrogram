@@ -46,7 +46,7 @@ public class PlaylistHandler {
     {
         if(
         (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
-        &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
+        &&(PlaylistStructure.isNotControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
         ){
             playlistObj.addProperty(PlaylistStructure.lastSelectedVariant.key(), variant);
             return true;
@@ -56,7 +56,7 @@ public class PlaylistHandler {
     JsonObject getVariant(String variant) throws InterruptedException {
         if(
                 (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
-                &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
+                &&(PlaylistStructure.isNotControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
         ){
             return playlistObj.getAsJsonObject(variant);
         }else throw new InterruptedException("Playlist not Valid or Variant name is incorrect!");
@@ -68,7 +68,7 @@ public class PlaylistHandler {
 
             for(Map.Entry<String, JsonElement> item : playlistObj.entrySet()){
                 if(
-                    (!PlaylistStructure.isControlKey(item.getKey()))
+                    (PlaylistStructure.isNotControlKey(item.getKey()))
                     &&(item.getValue().isJsonObject())
                 ){ /* Not a control key And it's a JSON Object*/
                     variants.add(item.getKey()); /* All JSONObjects except the Control values count as Variants */
@@ -144,7 +144,7 @@ public class PlaylistHandler {
     void addSongToVariant(File song, String variant) {
         if(
                 (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
-                &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
+                &&(PlaylistStructure.isNotControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
         ){
             JsonObject varObj = playlistObj.getAsJsonObject(variant);
             varObj.addProperty("" + varObj.size(), song.getAbsolutePath());
@@ -209,7 +209,7 @@ public class PlaylistHandler {
 
     boolean removeVariant(String variant){
         if(Validity.emptyList.ordinal() < isPlaylistValid().ordinal()){ /* The item exists in the playlist as a Variant */
-            return (!PlaylistStructure.isControlKey(variant))/* The item is not a Control key */
+            return (PlaylistStructure.isNotControlKey(variant))/* The item is not a Control key */
                     && (null != playlistObj.remove(variant)); /* The variant exists */
         } /* else the playlist doesn't have any variants to remove */ return false;
     }

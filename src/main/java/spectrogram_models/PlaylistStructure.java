@@ -6,11 +6,11 @@ public enum PlaylistStructure {
     lastSelectedVariant;
 
     public String key() {return this.name();}
-    public static boolean isControlKey(String key){
+    public static boolean isNotControlKey(String key){
         try{
-            return PlaylistStructure.valueOf(PlaylistStructure.class,key).key().equals(key);
+            return !PlaylistStructure.valueOf(PlaylistStructure.class, key).key().equals(key);
         } catch (Exception e) {
-            return false;
+            return true;
         }
     }
 }

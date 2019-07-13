@@ -1,5 +1,6 @@
 package spectrogram_services;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -11,9 +12,11 @@ import spectrogram_models.VariantTab;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class VariantTabHandler{
 
@@ -43,7 +46,10 @@ public class VariantTabHandler{
                 varObj = plHandler.getVariant(variant);
 
                 /* Load in the songs from the variants */
-                for(Map.Entry song: varObj.entrySet()){
+                List<Map.Entry<String, JsonElement>> songs = varObj.entrySet()
+                        .stream().sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
+                        .collect(Collectors.toList());
+                for(Map.Entry<String, JsonElement> song: songs){
                     mainAccordion.getPanes().add(
                         new SongPane(
                             new File(song.getValue().toString().trim().replaceAll("\"",""))
@@ -58,13 +64,7 @@ public class VariantTabHandler{
             /* Add button for adding music */
             VariantTab.getAddSongBtn(
                 VariantTab.createAddSongTitledPane(mainAccordion)
-            ).setOnAction(actionEvent -> {
-                try {
-                    addSong();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            });
+            ).setOnAction(actionEvent -> addSong());
 
             /* Set the content of the Tab */
             tab.setContent(VariantTab.createPlaylistContent(mainAccordion));
@@ -77,7 +77,7 @@ public class VariantTabHandler{
     }
 
     /* TODO: Last used Folder */
-    private void addSong() throws FileNotFoundException {
+    private void addSong(){
         FileChooser flc = new FileChooser();
         flc.setTitle("Add song to variant " + variant);
         flc.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Musica mp3", "*.mp3"));
