@@ -23,10 +23,10 @@ public class PlaylistHandler {
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()){
             playlistObj.add(variant, new JsonObject());
             System.out.println(playlistObj.toString());
-            return selectVariant(variant); /* includes a `flush()` */
+            flush();
+            return true;
         }else return false;
     }
-
 
     public boolean selectVariant(String variant, boolean writeOut){
         boolean ret = selectVariant(variant);
@@ -37,7 +37,8 @@ public class PlaylistHandler {
     public String getLastSelectedVariant() throws IllegalStateException{
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
         {
-            return playlistObj.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).toString();
+            return playlistObj.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).toString()
+                    .replace("\"","");
         }else throw new IllegalStateException("Unable to determine last selected Variant, playlist not valid!");
     }
 
@@ -52,11 +53,10 @@ public class PlaylistHandler {
         }else return false;
     }
 
-    public JsonObject getVariant(String variant) throws InterruptedException {
+    JsonObject getVariant(String variant) throws InterruptedException {
         if(
                 (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
                 &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
-                &&(selectVariant(variant)) /* Able to select */
         ){
             return playlistObj.getAsJsonObject(variant);
         }else throw new InterruptedException("Playlist not Valid or Variant name is incorrect!");
@@ -64,7 +64,7 @@ public class PlaylistHandler {
 
     public ArrayList<String> getPlaylistVariants() throws IllegalStateException {
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) {
-            ArrayList<String> variants = new ArrayList();
+            ArrayList<String> variants = new ArrayList<>();
 
             for(Map.Entry<String, JsonElement> item : playlistObj.entrySet()){
                 if(
@@ -81,7 +81,6 @@ public class PlaylistHandler {
     private void flush()
     {
         if(Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) {
-            System.out.println("Writing out: " + playlistObj.toString());
             try (FileWriter file = new FileWriter(playlistFile)) {
                 file.write(playlistObj.toString());
                 file.flush();
@@ -142,7 +141,7 @@ public class PlaylistHandler {
         }
     }
 
-    public void addSongToVariant(File song, String variant) throws FileNotFoundException {
+    void addSongToVariant(File song, String variant) throws FileNotFoundException {
         if(
                 (Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
                 &&(!PlaylistStructure.isControlKey(variant))&&(playlistObj.has(variant)) /* variant exists */
@@ -161,6 +160,7 @@ public class PlaylistHandler {
 
         if(!parsePlaylist())
         { /* unable to parse playlist --> Playlist is empty / new */
+            System.out.println("Unable to parse playlist!");
             try {
                 initializePlaylist();
             } catch (IllegalStateException e) {
@@ -207,7 +207,7 @@ public class PlaylistHandler {
         return Validity.undefined;
     }
 
-    public boolean removeVariant(String variant){
+    boolean removeVariant(String variant){
         if(Validity.emptyList.ordinal() < isPlaylistValid().ordinal()){
             if(
                 (!PlaylistStructure.isControlKey(variant))/* The item is not a Control key */

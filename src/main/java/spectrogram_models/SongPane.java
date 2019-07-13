@@ -3,6 +3,7 @@ package spectrogram_models;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import spectrogram_services.PlaylistHandler;
 
 import java.io.File;
 import java.io.IOException;

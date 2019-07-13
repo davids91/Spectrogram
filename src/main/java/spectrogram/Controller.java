@@ -40,7 +40,7 @@
             File defPlayList = new File(playlistPath);
             if(
                 (!playlistPath.isEmpty())
-                    &&(defPlayList.exists())
+                &&(defPlayList.exists())
             ) { /* Default playlist exists */
                 try {
                     plHandler.openPlaylist(defPlayList);
@@ -50,6 +50,13 @@
                     e.printStackTrace();
                 }
             } else playlistInvalidUpdateUI();
+
+            variantTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                /* Selected variant should be written out */
+                if(!plHandler.selectVariant(newValue.getText(),true)){
+                    System.out.println("Unable to select Variant (?)");
+                }
+            });
         }
 
         @FXML
@@ -146,6 +153,8 @@
                 }
 
                 VariantTab lastSelectedVariant = null;
+                System.out.println("Last selected: " + plHandler.getLastSelectedVariant());
+                assert variants != null;
                 for(String variant : variants)
                 {
                     VariantTabHandler tabHandler = new VariantTabHandler(plHandler,variant);
