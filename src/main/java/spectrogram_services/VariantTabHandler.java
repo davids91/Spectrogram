@@ -52,7 +52,8 @@ public class VariantTabHandler{
                 for(Map.Entry<String, JsonElement> song: songs){
                     mainAccordion.getPanes().add(
                         new SongPane(
-                            new File(song.getValue().toString().trim().replaceAll("\"",""))
+                            new File(song.getValue().toString().trim().replaceAll("\"","")),
+                            this
                         )
                     );
                 }
@@ -72,6 +73,12 @@ public class VariantTabHandler{
         }else throw new UnsupportedOperationException("Standalone VariantHandler not supported!");
     }
 
+    public void putAAfterB(SongPane a, SongPane b){
+        System.out.println("Putting " + a.getText() + " after " + b.getText());
+        /* Get smallest index */
+
+    }
+
     public VariantTab getTab(){
         return tab;
     }
@@ -88,7 +95,7 @@ public class VariantTabHandler{
                 plHandler.addSongToVariant(resultFile, variant);
 
                 /* Add Graphic for song */
-                mainAccordion.getPanes().add(0, new SongPane(resultFile));
+                mainAccordion.getPanes().add(0, new SongPane(resultFile, this));
             }
 
         }
