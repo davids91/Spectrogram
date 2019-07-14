@@ -4,6 +4,7 @@
     import javafx.scene.control.*;
     import javafx.stage.FileChooser;
     import spectrogram_models.Global;
+    import spectrogram_models.PlaylistStructure;
     import spectrogram_models.VariantTab;
     import spectrogram_services.PlaylistHandler;
     import spectrogram_services.VariantTabHandler;
@@ -50,7 +51,7 @@
 
             variantTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
                 /* Selected variant should be written out */
-                if(!plHandler.selectVariant(newValue.getText(),true)){
+                if((null != newValue)&&(!plHandler.selectVariant(newValue.getText(),true))){
                     System.out.println("Unable to select Variant (?)");
                 }
             });
@@ -61,7 +62,7 @@
         {
             if(
                 (null != plHandler)
-                &&(PlaylistHandler.Validity.emptyList.ordinal() <= plHandler.isPlaylistValid().ordinal())
+                &&(PlaylistStructure.Validity.emptyList.ordinal() <= plHandler.isPlaylistValid().ordinal())
             ){
                 if(plHandler.addVariant(newVariantText.getText()))reloadVariants();
                 else playlistInvalidUpdateUI();
@@ -135,7 +136,7 @@
         }
 
         private void reloadVariants(){
-            if(PlaylistHandler.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
+            if(PlaylistStructure.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 /* Fill up the tabPane with the variants from the playlist */
                 addVariantBtn.setVisible(true);
@@ -166,12 +167,12 @@
 
         private void playlistValidUpdateUI()
         {
-            if(PlaylistHandler.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
+            if(PlaylistStructure.Validity.unknownFormat.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 try {
                     playlistNameLabel.setText(plHandler.getPlayListName());
                     if(
-                        (PlaylistHandler.Validity.emptyList.ordinal() <= plHandler.isPlaylistValid().ordinal())
+                        (PlaylistStructure.Validity.emptyList.ordinal() <= plHandler.isPlaylistValid().ordinal())
                             &&(plHandler.getPlayListPath().equalsIgnoreCase(defaultPlaylistPath))
                     ) { /* Default Playlist equals with the opened one */
                         makeDefBtn.setDisable(true);
@@ -210,7 +211,7 @@
         @FXML
         void setDefaultPlaylist()
         {
-            if(PlaylistHandler.Validity.notAFile.ordinal() < plHandler.isPlaylistValid().ordinal())
+            if(PlaylistStructure.Validity.notAFile.ordinal() < plHandler.isPlaylistValid().ordinal())
             {
                 try {
                     String path = plHandler.getPlayListPath();

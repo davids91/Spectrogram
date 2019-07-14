@@ -14,5 +14,5 @@ The Playlist file shall contain the following labels:
 Any other label shall represent a variant, which shall be a JSON object.
 The Variant JSON object shall contain 
  - A unique Identifier
- - `0`..`1`..`2`..: the songs locations under a priority index.
+ - The songs as a JsonObject, described under song_data.md
  - `lastSInd`: Last selected song index inside the variant

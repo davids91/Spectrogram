@@ -3,6 +3,7 @@ package spectrogram_models;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.json.simple.JSONObject;
+import spectrogram_services.PlaylistHandler;
 
 import java.util.Map;
 import java.util.Random;
@@ -11,6 +12,11 @@ public enum PlaylistStructure {
 
     netLocation,
     lastSelectedVariant;
+
+
+    public enum Validity {
+        undefined, noexist, notAFile, invalidFormat, unknownFormat, emptyList, valid, encoded
+    }
 
     public static String SONG_JSONID_id = "id";
     public static String SONG_JSONID_index = "index";
@@ -23,6 +29,45 @@ public enum PlaylistStructure {
         } catch (Exception e) {
             return true;
         }
+    }
+
+    public static int lastUsedVariantSize(JsonObject playlistObject){
+        return playlistObject.getAsJsonObject(playlistObject.getAsJsonPrimitive(lastSelectedVariant.key()).getAsString()).size();
+    }
+
+    public static int getValidVariants(JsonObject playlistObject){
+        int ret = 0;
+        for(Map.Entry<String, JsonElement> object : playlistObject.entrySet()){
+            if(
+                isNotControlKey(object.getKey()) /* TODO: Loading fails on an empty playlist */
+                &&isValidVariant(object.getValue())
+            )ret++;
+        }
+        return ret;
+    }
+
+    public static boolean isValidVariant(JsonElement variantElement){ /* TODO: make more robust */
+        return (variantElement.isJsonNull() /* it is an empty variant */
+                ||((!variantElement.isJsonPrimitive()) /* it's a controlKey */
+                    && isValidSong(variantElement.getAsJsonObject().get("0").getAsJsonObject())) /* or the first song from the variant is valid*/
+        );
+    }
+
+    public static boolean isValidSong(JsonObject SongObject){
+        return SongObject.has(SONG_JSONID_id) && SongObject.has(SONG_JSONID_index) && SongObject.has(SONG_JSONID_location);
+    }
+
+    public static boolean isValidVariant(String variant, JsonObject playlistObject){
+        return (isNotControlKey(variant))&&(playlistObject.has(variant));
+    }
+
+    public static String getLastSelectedVariant(JsonObject playlistObject) /* TODO: show success */ {
+            return playlistObject.getAsJsonPrimitive(PlaylistStructure.lastSelectedVariant.key()).toString()
+                    .replace("\"","");
+    }
+
+    public static void addVariant(String variant, JsonObject playlist){
+        playlist.add(variant, new JsonObject());
     }
 
     public static String getSongPath(JsonObject song) throws NoSuchFieldException {
