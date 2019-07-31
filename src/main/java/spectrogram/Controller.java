@@ -184,6 +184,8 @@
                         openDefaultBtn.setDisable(false);
                     }
 
+                    System.out.println("Playlist state:" + plHandler.isPlaylistValid());
+
                     reloadVariants();
 
                 } catch (IllegalStateException e) {

@@ -12,6 +12,7 @@ import spectrogram_models.SongPane;
 import spectrogram_models.VariantTab;
 
 import java.io.File;
+import java.io.InvalidObjectException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,9 @@ public class VariantTabHandler{
 
     private String variant;
     private JsonObject variantObject = null;
-    private VariantTab tab = null;
+    private VariantTab tab;
     private PlaylistHandler plHandler;
     private Accordion mainAccordion;
-
-    /* TODO: Drag&&Drop rearranging the songs */
-    /* TODO: Save Last Selected Variant */
 
     public VariantTabHandler(PlaylistHandler plHandler, String variant){
         tab = new VariantTab();
@@ -41,18 +39,8 @@ public class VariantTabHandler{
             mainAccordion = new Accordion(); /* Add an Accordion and a titledPane for songs and to add new Music */
             try {
                 variantObject = plHandler.getVariant(variant); /* Load in the songs from the variants */
-                List<Map.Entry<String, JsonElement>> songs = variantObject.entrySet()
-                        .stream().sorted(Comparator.comparingInt(e -> Integer.parseInt(e.getKey())))
-                        .collect(Collectors.toList());
-                for(Map.Entry<String, JsonElement> song: songs){
-                    mainAccordion.getPanes().add(
-                        new SongPane(
-                            new File(PlaylistStructure.getSongPath(song.getValue().getAsJsonObject())),
-                            this
-                        )
-                    );
-                }
-            } catch (InterruptedException | NoSuchFieldException e) {
+                loadSongs();
+            } catch (InterruptedException | InvalidObjectException e) {
                 e.printStackTrace();
             }
 
@@ -69,8 +57,46 @@ public class VariantTabHandler{
 
     public void putAAfterB(SongPane a, SongPane b){
         System.out.println("Putting " + a.getText() + " after " + b.getText());
-        /* Get smallest index */
 
+        try {
+            JsonElement AObj = a.getObject();
+            JsonElement BObj = b.getObject();
+            int indexA = PlaylistStructure.getSongIndex(AObj,variantObject);
+            int indexB = PlaylistStructure.getSongIndex(BObj,variantObject);
+            if(indexA < indexB){ /* Song is moving up */
+                for (int i = indexA + 1; i <= indexB; i++){
+                    addSongIntoVarAtIndexI(
+                        PlaylistStructure.getSongAtIndex(variantObject,i),i - 1
+                    );
+                }
+            }else { /* Song is moving down */
+                for (int i = indexA - 1; i >= indexB; i--){
+                    addSongIntoVarAtIndexI(
+                        PlaylistStructure.getSongAtIndex(variantObject,i),i + 1
+                    );
+                }
+            }
+            addSongIntoVarAtIndexI(AObj,indexB);
+            loadSongs();
+        } catch (InvalidObjectException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addSongIntoVarAtIndexI(JsonElement song, int index) throws InvalidObjectException {
+        if(PlaylistStructure.isValidSong(song)){
+            if(variantObject.has(Integer.toString(index)))
+                variantObject.remove(Integer.toString(index));
+            variantObject.add(Integer.toString(index),song);
+        }else throw new InvalidObjectException("Unable to add song to Playlist as it is invalid!");
+    }
+
+    private void loadSongs() throws InvalidObjectException { /* TODO: Key to be used, song index to be eliminated */
+        mainAccordion.getPanes().clear();
+        List<Map.Entry<String, JsonElement>> songs = PlaylistStructure.getSorted(variantObject);
+        for(Map.Entry<String, JsonElement> song: songs){
+            mainAccordion.getPanes().add(new SongPane(song.getValue(),this));
+        }
     }
 
     public VariantTab getTab(){
@@ -86,10 +112,13 @@ public class VariantTabHandler{
 
         for(File resultFile : resultFiles){
             if((null != resultFile)&&(resultFile.exists())){
-                plHandler.addSongToVariant(resultFile, variant);
-
-                /* Add Graphic for song */
-                mainAccordion.getPanes().add(0, new SongPane(resultFile, this));
+                try {
+                    mainAccordion.getPanes().add(0,
+                        new SongPane(plHandler.addSongToVariant(resultFile, variant),this)
+                    );
+                } catch (InvalidObjectException e) {
+                    e.printStackTrace();
+                }
             }
 
         }

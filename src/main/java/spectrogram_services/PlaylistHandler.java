@@ -125,19 +125,23 @@ public class PlaylistHandler {
         }
     }
 
-    void addSongToVariant(File song, String variant) {
+    /**
+     * Adds a Song to the playlist
+     * @param song the File containing the Song
+     * @param variant the string of which variant it needs to be added to
+     * @return the new Song as a JsonObject
+     */
+    JsonObject addSongToVariant(File song, String variant) throws InvalidObjectException {
         if(
             (PlaylistStructure.Validity.emptyList.ordinal() <= isPlaylistValid().ordinal()) /* Playlist state is OK */
             &&(PlaylistStructure.isValidVariant(variant,playlistObject)) /* variant exists */
         ){
-            try {
-                JsonObject variantObject = playlistObject.getAsJsonObject(variant);
-                variantObject.add("" + variantObject.size(), PlaylistStructure.getSongObjectInto(song.getPath(),variantObject));
-                flush();
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            }
-        }else throw new IllegalStateException("Unable to add song! Playlist file is not valid or variant " + variant + " doesn't exist!");
+            JsonObject variantObject = playlistObject.getAsJsonObject(variant);
+            JsonObject songObject = PlaylistStructure.addNewSongObjectInto(song.getPath(),variantObject);
+            variantObject.add("" + variantObject.size(), songObject);
+            flush();
+            return songObject;
+        }else throw new InvalidObjectException("Unable to add song! Playlist file is not valid or variant " + variant + " doesn't exist!");
     }
 
     public boolean createNewPlaylist(File newPlaylist){
@@ -195,6 +199,7 @@ public class PlaylistHandler {
                 ) return PlaylistStructure.Validity.emptyList;
                 else return PlaylistStructure.Validity.invalidFormat;
             }catch (NullPointerException e){ /* JSON Control Sting not found in playlist File */
+                e.printStackTrace();
                 return PlaylistStructure.Validity.invalidFormat;
             }
         }else return PlaylistStructure.Validity.invalidFormat;

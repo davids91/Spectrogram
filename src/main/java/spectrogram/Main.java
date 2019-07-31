@@ -20,7 +20,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+        FXMLLoader mainLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxml/main.fxml"));
 
         /* Set up Global */
         ccfh = new CacheFileHandler(new File(".cache"));
